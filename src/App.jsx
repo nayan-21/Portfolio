@@ -6,6 +6,7 @@ import Projects from './components/Projects'
 import Learning from './components/Learning'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
+import DeadpoolMusic from './components/DeadpoolMusic'
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Learning />
         <Contact />
       </main>
+      <DeadpoolMusic />
       <Footer />
     </div>
   )

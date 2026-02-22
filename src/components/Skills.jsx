@@ -121,11 +121,7 @@ function SkillGroup({ group, index }) {
         variants={containerVariants}
         initial="hidden"
         animate={isInView ? 'visible' : 'hidden'}
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
-          gap: '0.65rem',
-        }}
+        className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 lg:gap-4"
       >
         {group.skills.map(skill => (
           <SkillCard key={skill.name} skill={skill} />

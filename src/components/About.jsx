@@ -64,14 +64,7 @@ export default function About() {
         </div>
 
         {/* Content — two-column on wide screens */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '3.5rem',
-            alignItems: 'start',
-          }}
-        >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
           {/* Paragraph lines */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
             {lines.map((line) => (

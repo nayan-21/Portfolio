@@ -62,15 +62,11 @@ function ProjectCard({ project, index }) {
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.65, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -5 }}
+      className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
       style={{
         background: 'var(--color-surface)',
         border: '1px solid var(--color-border)',
         borderRadius: '14px',
-        padding: '2rem 2.25rem',
-        display: 'grid',
-        gridTemplateColumns: '1fr auto',
-        gap: '1.5rem',
-        alignItems: 'start',
         transition: 'border-color 0.25s, box-shadow 0.25s',
         cursor: 'default',
       }}
@@ -156,15 +152,7 @@ function ProjectCard({ project, index }) {
       </div>
 
       {/* Right — buttons, stacked vertically */}
-      <div
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.6rem',
-          alignItems: 'flex-end',
-          paddingTop: '2px',
-        }}
-      >
+      <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0">
         <ProjectButton href={project.live}  label="Live"    Icon={IconExternalLink} />
         <ProjectButton href={project.github} label="GitHub" Icon={IconGithub}       />
       </div>
