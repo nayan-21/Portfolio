@@ -1,0 +1,99 @@
+/* ─── Fonts ──────────────────────────────────────── */
+@import "@fontsource/inter/300.css";
+@import "@fontsource/inter/400.css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/inter/600.css";
+@import "@fontsource/space-grotesk/500.css";
+@import "@fontsource/space-grotesk/600.css";
+@import "@fontsource/space-grotesk/700.css";
+
+/* ─── Tailwind ───────────────────────────────────── */
+@import "tailwindcss";
+
+/* ─── Design Tokens ──────────────────────────────── */
+@theme {
+  /* Colors */
+  --color-bg: #0D0D10;
+  --color-surface: #141418;
+  --color-surface-2: #1B1B22;
+  --color-border: #2A2A36;
+
+  --color-mystic: #7C3AED;
+  --color-mystic-light: #9F67FF;
+  --color-mystic-glow: rgba(124, 58, 237, 0.25);
+
+  --color-gold: #F59E0B;
+
+  --color-text: #E8E6F0;
+  --color-text-muted: #9B97B0;
+  --color-text-faint: #4E4A66;
+
+  /* Typography */
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-heading: "Space Grotesk", system-ui, sans-serif;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+}
+
+/* ─── Base Styles ────────────────────────────────── */
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+    /* offset for fixed navbar */
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    line-height: 1.2;
+    color: #ffffff;
+  }
+
+  ::selection {
+    background-color: var(--color-mystic-glow);
+    color: #ffffff;
+  }
+
+  /* Thin scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--color-bg);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-mystic);
+  }
+}
