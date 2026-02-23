@@ -1,10 +1,11 @@
 /* ─── Section helper ─────────────────────────────────────────────────────── */
 /*  Wrap each section in this to get consistent spacing + max-width.         */
 
-export default function Section({ id, children, style = {} }) {
+export default function Section({ id, children, style = {}, sectionRef }) {
   return (
     <section
       id={id}
+      ref={sectionRef}
       style={{
         width: '100%',
         padding: '96px 0',

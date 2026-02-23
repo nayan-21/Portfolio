@@ -1,157 +1,134 @@
-import { useEffect, useRef, useState } from 'react'
-import { motion, useMotionValue, useSpring } from 'framer-motion'
+import { motion } from 'framer-motion'
 
 /* ─────────────────────────────────────────────────────────────────────────
-   PortalRing
-   – SVG arcs that form a stylised open portal / ring
-   – Floats very slowly (y oscillation) via Framer Motion
-   – A **very subtle** attraction toward the cursor (cursor magnet on the
-     element itself, NOT the text) using a spring so it feels physical
+   ArcReactor
+   – Iron Man–style energy core (arc reactor)
+   – Cool blue / white glow, cinematic and premium
+   – Static SVG image + CSS keyframe animations only
+   – GPU-friendly: only opacity and transform animated
+   – Respects prefers-reduced-motion
 ──────────────────────────────────────────────────────────────────────────── */
-function PortalRing() {
-  const ringRef = useRef(null)
 
-  // spring-smoothed raw mouse values
-  const rawX = useMotionValue(0)
-  const rawY = useMotionValue(0)
-
-  const x = useSpring(rawX, { stiffness: 28, damping: 18, mass: 1.4 })
-  const y = useSpring(rawY, { stiffness: 28, damping: 18, mass: 1.4 })
-
-  useEffect(() => {
-    const handleMouse = (e) => {
-      const cx = window.innerWidth / 2
-      const cy = window.innerHeight / 2
-
-      // offset from visual center, scaled down to keep movement tiny
-      const dx = (e.clientX - cx) * 0.022
-      const dy = (e.clientY - cy) * 0.022
-
-      rawX.set(dx)
-      rawY.set(dy)
+const ARC_REACTOR_STYLES = `
+  @keyframes arc-glow-pulse {
+    0%, 100% {
+      opacity: 0.82;
+      filter: drop-shadow(0 0 28px rgba(0,200,255,0.55))
+              drop-shadow(0 0 60px rgba(0,160,220,0.28))
+              drop-shadow(0 0 100px rgba(0,100,180,0.14));
     }
+    50% {
+      opacity: 1;
+      filter: drop-shadow(0 0 44px rgba(80,230,255,0.9))
+              drop-shadow(0 0 88px rgba(0,200,255,0.45))
+              drop-shadow(0 0 150px rgba(0,140,220,0.22));
+    }
+  }
 
-    window.addEventListener('mousemove', handleMouse)
-    return () => window.removeEventListener('mousemove', handleMouse)
-  }, [rawX, rawY])
+  @keyframes arc-breathe {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    50%       { transform: scale(1.028) rotate(0.4deg); }
+  }
 
+  /* Light sweep — thin diagonal specular, fires ~every 10s, lasts 0.7s */
+  @keyframes arc-sweep {
+    0%      { transform: translateX(-160%) rotate(-28deg); opacity: 0;    }
+    3%      { opacity: 0.13; }
+    7%      { transform: translateX(160%)  rotate(-28deg); opacity: 0;    }
+    100%    { transform: translateX(160%)  rotate(-28deg); opacity: 0;    }
+  }
+
+  .arc-sweep {
+    animation: arc-sweep 10s ease-in-out infinite;
+    will-change: transform, opacity;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .arc-reactor-img {
+      animation: none !important;
+      opacity: 0.9 !important;
+    }
+    .arc-sweep {
+      animation: none !important;
+    }
+  }
+
+  .arc-reactor-img {
+    animation:
+      arc-glow-pulse 4.5s ease-in-out infinite,
+      arc-breathe    8s   ease-in-out infinite;
+    will-change: transform, opacity, filter;
+  }
+`
+
+function ArcReactor() {
   return (
-    <motion.div
-      ref={ringRef}
-      style={{ x, y }}
-      // slow float: breathe up and down
-      animate={{ y: [0, -18, 0] }}
-      transition={{
-        duration: 8,
-        repeat: Infinity,
-        ease: 'easeInOut',
-        // note: the spring y from cursor sits on top of this via style.y
-        // they combine automatically in Framer
-      }}
-      aria-hidden
-      className="absolute inset-0 flex items-center justify-center pointer-events-none select-none"
-    >
-      <svg
-        width="100%"
-        height="100%"
-        viewBox="0 0 540 540"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        style={{ opacity: 0.72, maxWidth: 540, maxHeight: 540 }}
+    <>
+      <style>{ARC_REACTOR_STYLES}</style>
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          pointerEvents: 'none',
+          userSelect: 'none',
+          zIndex: 0,
+        }}
       >
-        {/* ── Outer diffuse glow blob (not a ring, just radial colour) ── */}
-        <defs>
-          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%"   stopColor="#7C3AED" stopOpacity="0.18" />
-            <stop offset="100%" stopColor="#7C3AED" stopOpacity="0" />
-          </radialGradient>
-
-          {/* arc gradient – purple → indigo → transparent */}
-          <linearGradient id="arcGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%"   stopColor="#9F67FF" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#4F46E5" stopOpacity="0.1" />
-          </linearGradient>
-
-          <linearGradient id="arcGrad2" x1="100%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%"   stopColor="#7C3AED" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#C084FC" stopOpacity="0.05" />
-          </linearGradient>
-
-          {/* Tiny bright dot at arc tip */}
-          <filter id="bloom" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        {/* Diffuse background glow */}
-        <circle cx="270" cy="270" r="270" fill="url(#glow)" />
-
-        {/* ── Ring 1 – outer arc, 75 % of circle ── */}
-        <motion.circle
-          cx="270" cy="270" r="220"
-          stroke="url(#arcGrad1)"
-          strokeWidth="1.5"
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray="1036"        /* circumference ≈ 2π×220 ≈ 1382 */
-          strokeDashoffset="345"        /* leaves ~75% visible */
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          style={{ transformOrigin: '270px 270px' }}
+        {/* Outer ambient bloom — pure CSS, no JS */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 520,
+            height: 520,
+            borderRadius: '50%',
+            background:
+              'radial-gradient(circle, rgba(0,200,255,0.10) 0%, rgba(0,120,200,0.05) 45%, transparent 70%)',
+            animation: 'arc-glow-pulse 4.5s ease-in-out infinite',
+            willChange: 'opacity',
+          }}
         />
 
-        {/* ── Ring 2 – inner, rotates opposite, ~55 % visible ── */}
-        <motion.circle
-          cx="270" cy="270" r="172"
-          stroke="url(#arcGrad2)"
-          strokeWidth="1"
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray="1081"         /* 2π×172 ≈ 1081 */
-          strokeDashoffset="486"         /* leaves ~55% visible */
-          animate={{ rotate: -360 }}
-          transition={{ duration: 45, repeat: Infinity, ease: 'linear' }}
-          style={{ transformOrigin: '270px 270px' }}
-        />
+        {/* Light sweep — clipped circle, fires once per 10s cycle */}
+        <div
+          style={{
+            position: 'absolute',
+            width: 560,
+            height: 560,
+            borderRadius: '50%',
+            overflow: 'hidden',
+            pointerEvents: 'none',
+          }}
+        >
+          <div
+            className="arc-sweep"
+            style={{
+              position: 'absolute',
+              inset: 0,
+              background:
+                'linear-gradient(105deg, transparent 35%, rgba(180,240,255,0.18) 48%, rgba(255,255,255,0.13) 50%, rgba(180,240,255,0.18) 52%, transparent 65%)',
+            }}
+          />
+        </div>
 
-        {/* ── Ring 3 – innermost accent ring, very faint ── */}
-        <motion.circle
-          cx="270" cy="270" r="128"
-          stroke="#C084FC"
-          strokeWidth="0.6"
-          fill="none"
-          strokeLinecap="round"
-          strokeDasharray="804"
-          strokeDashoffset="600"
-          opacity="0.35"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
-          style={{ transformOrigin: '270px 270px' }}
+        {/* The reactor image itself */}
+        <img
+          className="arc-reactor-img"
+          src="/arc-reactor.svg"
+          alt=""
+          width={680}
+          height={680}
+          style={{
+            flexShrink: 0,
+            display: 'block',
+          }}
+          draggable={false}
         />
-
-        {/* ── Glowing dots at arc tips (outer ring, 0° and ~270°) ── */}
-        <motion.circle
-          cx="490" cy="270" r="4"
-          fill="#9F67FF"
-          filter="url(#bloom)"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          style={{ transformOrigin: '270px 270px' }}
-        />
-        <motion.circle
-          cx="270" cy="50" r="3"
-          fill="#7C3AED"
-          filter="url(#bloom)"
-          animate={{ rotate: 360 }}
-          transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
-          style={{ transformOrigin: '270px 270px' }}
-        />
-      </svg>
-    </motion.div>
+      </div>
+    </>
   )
 }
 
@@ -168,13 +145,13 @@ export default function Hero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'hidden',
+        overflow: 'visible',
         padding: '120px 32px 80px',
         background: 'var(--color-bg)',
       }}
     >
-      {/* Abstract portal ring — behind text */}
-      <PortalRing />
+      {/* Arc Reactor — behind hero text, z-index 0 */}
+      <ArcReactor />
 
       {/* ── Hero text — fully static, no motion ── */}
       <div

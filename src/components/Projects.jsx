@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Section from './Section'
+import SpiderManSwing from './SpiderManSwing'
 
 const projects = [
   {
@@ -201,8 +202,17 @@ function useToggle() {
 }
 
 export default function Projects() {
+  const sectionRef = useRef(null)
+
   return (
-    <Section id="projects" style={{ background: 'var(--color-surface)' }}>
+    <Section
+      id="projects"
+      style={{ background: 'var(--color-surface)', position: 'relative' }}
+      sectionRef={sectionRef}
+    >
+      {/* Spider-Man swing — triggered by viewport entry */}
+      <SpiderManSwing sectionRef={sectionRef} />
+
       {/* Heading */}
       <div style={{ marginBottom: '3.5rem' }}>
         <p

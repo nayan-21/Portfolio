@@ -9,12 +9,38 @@ const lines = [
   "Still early in the journey — but building every day, with intention.",
 ]
 
+/* ── Deadpool animation styles — injected once, CSS-only, GPU transforms ── */
+const DP_STYLES = `
+  /* Sitting idle — breathe anchored from top so he bobs slightly as if sitting */
+  @keyframes dp-breathe {
+    0%, 100% { transform: scaleY(1);      }
+    50%       { transform: scaleY(1.012);  }
+  }
+  .dp-char {
+    animation: dp-breathe 6s ease-in-out infinite;
+    will-change: transform;
+    transform-origin: top center;
+    transition: filter 0.4s ease;
+  }
+  .dp-char:hover {
+    filter: drop-shadow(-4px 8px 22px rgba(200,0,0,0.35))
+            drop-shadow(-4px 8px 14px rgba(0,0,0,0.6));
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .dp-char {
+      animation: none !important;
+    }
+  }
+`
+
 export default function About() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
 
   return (
     <Section id="about" style={{ background: 'var(--color-surface)' }}>
+      <style>{DP_STYLES}</style>
+
       {/* Section container — fades in with a slight gravity drop */}
       <motion.div
         ref={ref}
@@ -85,53 +111,83 @@ export default function About() {
             ))}
           </div>
 
-          {/* Right column — quick facts */}
-          <div
-            style={{
-              background: 'var(--color-surface-2)',
-              border: '1px solid var(--color-border)',
-              borderRadius: '12px',
-              padding: '2rem',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '1.5rem',
-            }}
-          >
-            {[
-              { label: 'Degree',    value: 'B.Tech — Computer Science' },
-              { label: 'Focus',     value: 'Frontend Development' },
-              { label: 'Currently', value: 'Building, learning, shipping' },
-              { label: 'Open to',   value: 'Internships & collabs' },
-            ].map(item => (
-              <div key={item.label}>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.7rem',
-                    fontWeight: 600,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    color: 'var(--color-mystic-light)',
-                    margin: '0 0 4px',
-                  }}
-                >
-                  {item.label}
-                </p>
-                <p
-                  style={{
-                    fontFamily: 'var(--font-sans)',
-                    fontSize: '0.97rem',
-                    color: 'var(--color-text)',
-                    margin: 0,
-                  }}
-                >
-                  {item.value}
-                </p>
-              </div>
-            ))}
+          {/* Right column — info card with Deadpool sitting on top-right edge */}
+          <div>
+            {/* Info card — position:relative so Deadpool anchors to it */}
+            <div
+              style={{
+                position: 'relative',
+                background: 'var(--color-surface-2)',
+                border: '1px solid var(--color-border)',
+                borderRadius: '12px',
+                padding: '2rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '1.5rem',
+                /* Allow Deadpool to extend visually above the card */
+                overflow: 'visible',
+              }}
+            >
+              {[
+                { label: 'Degree',    value: 'B.Tech — Computer Science' },
+                { label: 'Focus',     value: 'Frontend Development' },
+                { label: 'Currently', value: 'Building, learning, shipping' },
+                { label: 'Open to',   value: 'Internships & collabs' },
+              ].map(item => (
+                <div key={item.label}>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '0.7rem',
+                      fontWeight: 600,
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      color: 'var(--color-mystic-light)',
+                      margin: '0 0 4px',
+                    }}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-sans)',
+                      fontSize: '0.97rem',
+                      color: 'var(--color-text)',
+                      margin: 0,
+                    }}
+                  >
+                    {item.value}
+                  </p>
+                </div>
+              ))}
+
+              {/* ── Deadpool sitting on the card's top-right edge ──────────────
+                  deadpool_ON.png = seated reading pose, white bg.
+                  mix-blend-mode: multiply dissolves the white bg on the dark card.
+                  Negative top pulls him up so his lap/thighs sit on the card edge.
+              ─────────────────────────────────────────────────────────────── */}
+              <img
+                className="dp-char"
+                src="/deadpool_new.png"
+                alt="Deadpool sitting on the card reading"
+                draggable={false}
+                style={{
+                  position: 'absolute',
+                  /* Seat aligns exactly with card top edge */
+                  top: '-132px',
+                  right: '8px',
+                  width: '178px',
+                  height: 'auto',
+                  filter: 'drop-shadow(-4px 8px 18px rgba(0,0,0,0.65))',
+                  zIndex: 2,
+                  userSelect: 'none',
+                }}
+              />
+            </div>
           </div>
         </div>
       </motion.div>
     </Section>
   )
 }
+
