@@ -52,7 +52,7 @@ function IconGithub({ color }) {
   )
 }
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project, index, isFeature }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -63,99 +63,128 @@ function ProjectCard({ project, index }) {
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.65, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
       whileHover={{ y: -5 }}
-      className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
-      style={{
-        background: 'var(--color-surface)',
-        border: '1px solid var(--color-border)',
-        borderRadius: '14px',
-        transition: 'border-color 0.25s, box-shadow 0.25s',
-        cursor: 'default',
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.borderColor = 'rgba(124,58,237,0.55)'
-        e.currentTarget.style.boxShadow = '0 0 32px -8px rgba(124,58,237,0.22)'
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'var(--color-border)'
-        e.currentTarget.style.boxShadow = 'none'
-      }}
+      style={{ position: 'relative' }}
     >
-      {/* Left — content */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
-
-        {/* Title */}
-        <h3
+      {/* Spider-Man side accent — first card only, fades in with card */}
+      {isFeature && (
+        <img
+          src="/spider_sit.jpeg"
+          alt=""
+          draggable={false}
+          loading="lazy"
           style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: '1.35rem',
-            fontWeight: 700,
-            color: '#fff',
-            margin: 0,
+            position: 'absolute',
+            right: '-60px',
+            top: '58%',
+            transform: 'translateY(-50%)',
+            width: '140px',
+            height: 'auto',
+            opacity: isInView ? 0.78 : 0,
+            transition: 'opacity 0.9s ease',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            zIndex: 5,
+            filter: 'drop-shadow(-4px 0 16px rgba(0,0,0,0.75))',
           }}
-        >
-          {project.title}
-        </h3>
+        />
+      )}
 
-        {/* Fields */}
-        {[
-          { label: 'Objective', value: project.objective },
-          { label: 'Approach',  value: project.approach  },
-          { label: 'Outcome',   value: project.outcome   },
-        ].map(f => (
-          <div key={f.label} style={{ display: 'flex', gap: '0.6rem', alignItems: 'baseline' }}>
-            <span
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                color: 'var(--color-mystic-light)',
-                flexShrink: 0,
-                paddingTop: '2px',
-              }}
-            >
-              {f.label}
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.95rem',
-                color: 'var(--color-text-muted)',
-                lineHeight: 1.6,
-              }}
-            >
-              {f.value}
-            </span>
-          </div>
-        ))}
+      {/* Card inner */}
+      <div
+        className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
+        style={{
+          background: 'var(--color-surface)',
+          border: '1px solid var(--color-border)',
+          borderRadius: '14px',
+          transition: 'border-color 0.25s, box-shadow 0.25s',
+          cursor: 'default',
+        }}
+        onMouseEnter={e => {
+          e.currentTarget.style.borderColor = 'rgba(124,58,237,0.55)'
+          e.currentTarget.style.boxShadow = '0 0 32px -8px rgba(124,58,237,0.22)'
+        }}
+        onMouseLeave={e => {
+          e.currentTarget.style.borderColor = 'var(--color-border)'
+          e.currentTarget.style.boxShadow = 'none'
+        }}
+      >
+        {/* Left — content */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
-        {/* Tech tags */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
-          {project.tech.map(t => (
-            <span
-              key={t}
-              style={{
-                fontFamily: 'var(--font-sans)',
-                fontSize: '0.75rem',
-                fontWeight: 500,
-                padding: '3px 11px',
-                borderRadius: 9999,
-                background: 'rgba(124,58,237,0.1)',
-                border: '1px solid rgba(124,58,237,0.22)',
-                color: 'var(--color-mystic-light)',
-              }}
-            >
-              {t}
-            </span>
+          {/* Title */}
+          <h3
+            style={{
+              fontFamily: 'var(--font-heading)',
+              fontSize: '1.35rem',
+              fontWeight: 700,
+              color: '#fff',
+              margin: 0,
+            }}
+          >
+            {project.title}
+          </h3>
+
+          {/* Fields */}
+          {[
+            { label: 'Objective', value: project.objective },
+            { label: 'Approach',  value: project.approach  },
+            { label: 'Outcome',   value: project.outcome   },
+          ].map(f => (
+            <div key={f.label} style={{ display: 'flex', gap: '0.6rem', alignItems: 'baseline' }}>
+              <span
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.7rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: 'var(--color-mystic-light)',
+                  flexShrink: 0,
+                  paddingTop: '2px',
+                }}
+              >
+                {f.label}
+              </span>
+              <span
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.95rem',
+                  color: 'var(--color-text-muted)',
+                  lineHeight: 1.6,
+                }}
+              >
+                {f.value}
+              </span>
+            </div>
           ))}
-        </div>
-      </div>
 
-      {/* Right — buttons, stacked vertically */}
-      <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0">
-        <ProjectButton href={project.live}  label="Live"    Icon={IconExternalLink} />
-        <ProjectButton href={project.github} label="GitHub" Icon={IconGithub}       />
+          {/* Tech tags */}
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
+            {project.tech.map(t => (
+              <span
+                key={t}
+                style={{
+                  fontFamily: 'var(--font-sans)',
+                  fontSize: '0.75rem',
+                  fontWeight: 500,
+                  padding: '3px 11px',
+                  borderRadius: 9999,
+                  background: 'rgba(124,58,237,0.1)',
+                  border: '1px solid rgba(124,58,237,0.22)',
+                  color: 'var(--color-mystic-light)',
+                }}
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Right — buttons, stacked vertically */}
+        <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0">
+          <ProjectButton href={project.live}  label="Live"    Icon={IconExternalLink} />
+          <ProjectButton href={project.github} label="GitHub" Icon={IconGithub}       />
+        </div>
       </div>
     </motion.div>
   )
@@ -253,7 +282,7 @@ export default function Projects() {
       {/* Vertically stacked project cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {projects.map((project, i) => (
-          <ProjectCard key={project.title} project={project} index={i} />
+          <ProjectCard key={project.title} project={project} index={i} isFeature={i === 0} />
         ))}
       </div>
     </Section>

@@ -90,7 +90,8 @@ export default function DeadpoolMusic() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [showTooltip, setShowTooltip] = useState(false)
   const [characterState, setCharacterState] = useState('idle')
-  
+  const [visible, setVisible] = useState(false)
+
   const audioRef = useRef(null)
   const fadeIntervalId = useRef(null)
 
@@ -102,6 +103,12 @@ export default function DeadpoolMusic() {
   useEffect(() => {
     setCharacterState(isPlaying ? 'dance' : 'idle')
   }, [isPlaying])
+
+  // Delay bubble appearance by 2.5s to avoid early distraction
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 2500)
+    return () => clearTimeout(timer)
+  }, [])
 
   useEffect(() => {
     const audio = audioRef.current
@@ -171,6 +178,12 @@ export default function DeadpoolMusic() {
 
       <div
         className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-center gap-2 scale-[0.65] md:scale-90 origin-bottom-right transition-transform"
+        style={{
+          opacity: visible ? 1 : 0,
+          transform: visible ? undefined : 'translateY(16px)',
+          transition: 'opacity 0.7s ease, transform 0.7s ease',
+          pointerEvents: visible ? 'auto' : 'none',
+        }}
       >
         <AnimatePresence>
           {showTooltip && (

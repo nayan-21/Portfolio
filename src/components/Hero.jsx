@@ -1,136 +1,6 @@
 import { motion } from 'framer-motion'
 
-/* ─────────────────────────────────────────────────────────────────────────
-   ArcReactor
-   – Iron Man–style energy core (arc reactor)
-   – Cool blue / white glow, cinematic and premium
-   – Static SVG image + CSS keyframe animations only
-   – GPU-friendly: only opacity and transform animated
-   – Respects prefers-reduced-motion
-──────────────────────────────────────────────────────────────────────────── */
 
-const ARC_REACTOR_STYLES = `
-  @keyframes arc-glow-pulse {
-    0%, 100% {
-      opacity: 0.82;
-      filter: drop-shadow(0 0 28px rgba(0,200,255,0.55))
-              drop-shadow(0 0 60px rgba(0,160,220,0.28))
-              drop-shadow(0 0 100px rgba(0,100,180,0.14));
-    }
-    50% {
-      opacity: 1;
-      filter: drop-shadow(0 0 44px rgba(80,230,255,0.9))
-              drop-shadow(0 0 88px rgba(0,200,255,0.45))
-              drop-shadow(0 0 150px rgba(0,140,220,0.22));
-    }
-  }
-
-  @keyframes arc-breathe {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    50%       { transform: scale(1.028) rotate(0.4deg); }
-  }
-
-  /* Light sweep — thin diagonal specular, fires ~every 10s, lasts 0.7s */
-  @keyframes arc-sweep {
-    0%      { transform: translateX(-160%) rotate(-28deg); opacity: 0;    }
-    3%      { opacity: 0.13; }
-    7%      { transform: translateX(160%)  rotate(-28deg); opacity: 0;    }
-    100%    { transform: translateX(160%)  rotate(-28deg); opacity: 0;    }
-  }
-
-  .arc-sweep {
-    animation: arc-sweep 10s ease-in-out infinite;
-    will-change: transform, opacity;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .arc-reactor-img {
-      animation: none !important;
-      opacity: 0.9 !important;
-    }
-    .arc-sweep {
-      animation: none !important;
-    }
-  }
-
-  .arc-reactor-img {
-    animation:
-      arc-glow-pulse 4.5s ease-in-out infinite,
-      arc-breathe    8s   ease-in-out infinite;
-    will-change: transform, opacity, filter;
-  }
-`
-
-function ArcReactor() {
-  return (
-    <>
-      <style>{ARC_REACTOR_STYLES}</style>
-      <div
-        aria-hidden
-        style={{
-          position: 'absolute',
-          inset: 0,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          pointerEvents: 'none',
-          userSelect: 'none',
-          zIndex: 0,
-        }}
-      >
-        {/* Outer ambient bloom — pure CSS, no JS */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 520,
-            height: 520,
-            borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(0,200,255,0.10) 0%, rgba(0,120,200,0.05) 45%, transparent 70%)',
-            animation: 'arc-glow-pulse 4.5s ease-in-out infinite',
-            willChange: 'opacity',
-          }}
-        />
-
-        {/* Light sweep — clipped circle, fires once per 10s cycle */}
-        <div
-          style={{
-            position: 'absolute',
-            width: 560,
-            height: 560,
-            borderRadius: '50%',
-            overflow: 'hidden',
-            pointerEvents: 'none',
-          }}
-        >
-          <div
-            className="arc-sweep"
-            style={{
-              position: 'absolute',
-              inset: 0,
-              background:
-                'linear-gradient(105deg, transparent 35%, rgba(180,240,255,0.18) 48%, rgba(255,255,255,0.13) 50%, rgba(180,240,255,0.18) 52%, transparent 65%)',
-            }}
-          />
-        </div>
-
-        {/* The reactor image itself */}
-        <img
-          className="arc-reactor-img"
-          src="/arc-reactor.svg"
-          alt=""
-          width={680}
-          height={680}
-          style={{
-            flexShrink: 0,
-            display: 'block',
-          }}
-          draggable={false}
-        />
-      </div>
-    </>
-  )
-}
 
 /* ─────────────────────────────────────────────────────────────────────────
    Hero
@@ -145,15 +15,68 @@ export default function Hero() {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        overflow: 'visible',
+        overflow: 'hidden',
         padding: '120px 32px 80px',
-        background: 'var(--color-bg)',
       }}
     >
-      {/* Arc Reactor — behind hero text, z-index 0 */}
-      <ArcReactor />
+      {/* ── Full-cover background: Iron Man eyes ── */}
+      <img
+        src="/ironman_eye.jpeg"
+        alt=""
+        aria-hidden
+        draggable={false}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center 42%',
+          zIndex: 0,
+          userSelect: 'none',
+          pointerEvents: 'none',
+        }}
+      />
 
-      {/* ── Hero text — fully static, no motion ── */}
+      {/* ── Dark gradient overlay — cinematic ── */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          inset: 0,
+          zIndex: 1,
+          background: `
+            linear-gradient(
+              to bottom,
+              rgba(4, 6, 14, 0.78) 0%,
+              rgba(4, 6, 14, 0.62) 32%,
+              rgba(4, 6, 14, 0.72) 65%,
+              rgba(4, 6, 14, 0.92) 100%
+            )
+          `,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── Soft radial vignette behind the text block ── */}
+      <div
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 720,
+          height: 560,
+          borderRadius: '50%',
+          background:
+            'radial-gradient(ellipse at center, rgba(4,6,14,0.55) 0%, rgba(4,6,14,0.28) 50%, transparent 75%)',
+          zIndex: 3,
+          pointerEvents: 'none',
+        }}
+      />
+
+      {/* ── Hero text — z-index 10, fully static ── */}
       <div
         style={{
           position: 'relative',
@@ -228,6 +151,7 @@ export default function Hero() {
 
         {/* CTAs */}
         <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '0.5rem' }}>
+          {/* Primary button — subtle cyan glow matching arc reactor */}
           <a
             href="#projects"
             style={{
@@ -239,14 +163,25 @@ export default function Hero() {
               background: 'var(--color-mystic)',
               color: '#fff',
               textDecoration: 'none',
-              transition: 'opacity 0.2s, transform 0.2s',
+              transition: 'opacity 0.2s, transform 0.2s, box-shadow 0.2s',
               display: 'inline-block',
+              boxShadow: '0 0 18px rgba(0, 190, 255, 0.28), 0 0 40px rgba(0, 160, 220, 0.12)',
             }}
-            onMouseEnter={e => { e.currentTarget.style.opacity = '0.82'; e.currentTarget.style.transform = 'translateY(-2px)' }}
-            onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'translateY(0)' }}
+            onMouseEnter={e => {
+              e.currentTarget.style.opacity = '0.82'
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 0 26px rgba(0, 200, 255, 0.42), 0 0 60px rgba(0, 160, 220, 0.18)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.opacity = '1'
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = '0 0 18px rgba(0, 190, 255, 0.28), 0 0 40px rgba(0, 160, 220, 0.12)'
+            }}
           >
             View My Work
           </a>
+
+          {/* Secondary button — unchanged */}
           <a
             href="#contact"
             style={{
@@ -285,7 +220,6 @@ export default function Hero() {
           <span style={{ fontFamily: 'var(--font-sans)', fontSize: '0.7rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--color-text-faint)' }}>
             Scroll
           </span>
-          {/* Animated scroll line */}
           <motion.div
             style={{ width: 1, height: 36, background: 'linear-gradient(to bottom, var(--color-mystic), transparent)', borderRadius: 9999 }}
             animate={{ scaleY: [1, 0.4, 1], opacity: [0.8, 0.2, 0.8] }}
