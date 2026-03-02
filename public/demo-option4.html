@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Option 4 Demo — Cinematic Camera Push-In</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cyan: #00c8ff;
+      --bg: #04060e;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── Sticky hero wrapper — tall enough to scroll through ── */
+    #hero-sticky {
+      position: relative;
+      height: 300vh; /* scroll travel distance */
+    }
+
+    /* ── The actual fixed panel ── */
+    #hero-panel {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── Vignette overlay (darkens edges, controlled by JS) ── */
+    #vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      background: radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(4, 6, 14, 0.55) 55%,
+        rgba(4, 6, 14, 0.95) 100%
+      );
+      transition: opacity 0.05s linear;
+    }
+
+    /* ── Subtle star particles ── */
+    #stars {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .star {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.7);
+      animation: twinkle var(--d) ease-in-out infinite alternate;
+    }
+    @keyframes twinkle {
+      from { opacity: 0.1; }
+      to   { opacity: 0.8; }
+    }
+
+    /* ── Camera rig: everything that scales + blurs ── */
+    #camera-rig {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.6rem;
+      text-align: center;
+      padding: 0 2rem;
+      will-change: transform, filter, opacity;
+      /* Initial: pushed away, small, blurry */
+      transform: scale(0.32) translateZ(0);
+      filter: blur(10px);
+      opacity: 0.15;
+    }
+
+    .eyebrow {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+      color: var(--cyan);
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3.5rem, 9vw, 7rem);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -3px;
+      background: linear-gradient(135deg, #ffffff 40%, rgba(0,200,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .tagline {
+      font-size: clamp(1rem, 2.2vw, 1.4rem);
+      font-weight: 400;
+      color: rgba(255,255,255,0.62);
+      max-width: 520px;
+      line-height: 1.6;
+    }
+
+    .cta-row {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary {
+      padding: 13px 32px;
+      border-radius: 9999px;
+      background: var(--cyan);
+      color: #04060e;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      box-shadow: 0 0 24px rgba(0,200,255,0.35), 0 0 60px rgba(0,160,220,0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 0 36px rgba(0,200,255,0.55);
+    }
+
+    .btn-ghost {
+      padding: 13px 32px;
+      border-radius: 9999px;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.8);
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      font-size: 0.88rem;
+      text-decoration: none;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+    .btn-ghost:hover {
+      border-color: var(--cyan);
+      transform: translateY(-3px);
+    }
+
+    /* ── Scroll hint ── */
+    #scroll-hint {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+    #scroll-hint span {
+      font-size: 0.65rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+    #scroll-hint .line {
+      width: 1px;
+      height: 38px;
+      background: linear-gradient(to bottom, var(--cyan), transparent);
+      border-radius: 9999px;
+      animation: pulse-line 2s ease-in-out infinite;
+    }
+    @keyframes pulse-line {
+      0%, 100% { opacity: 0.8; transform: scaleY(1); }
+      50%       { opacity: 0.2; transform: scaleY(0.4); }
+    }
+
+    /* ── Next section placeholder ── */
+    #next-section {
+      min-height: 100vh;
+      background: #080b18;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 0.08em;
+    }
+
+    /* ── Progress bar (for demo) ── */
+    #progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 2px;
+      background: linear-gradient(to right, var(--cyan), transparent);
+      z-index: 100;
+      width: 0%;
+      transition: width 0.05s linear;
+    }
+
+    /* ── Label (for demo) ── */
+    #demo-label {
+      position: fixed;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(0,200,255,0.5);
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+  <div id="demo-label">↓ Scroll to experience</div>
+
+  <!-- HERO STICKY BLOCK -->
+  <div id="hero-sticky">
+    <div id="hero-panel">
+
+      <!-- Stars -->
+      <div id="stars"></div>
+
+      <!-- Vignette -->
+      <div id="vignette"></div>
+
+      <!-- Camera rig (the push-in target) -->
+      <div id="camera-rig">
+        <p class="eyebrow">Frontend Developer &nbsp;/&nbsp; CS Student</p>
+        <h1>Nayan</h1>
+        <p class="tagline">
+          Every developer has an origin story.<br />
+          Mine started with curiosity.
+        </p>
+        <div class="cta-row">
+          <a href="#next-section" class="btn-primary">View My Work</a>
+          <a href="#" class="btn-ghost">Get In Touch</a>
+        </div>
+      </div>
+
+      <!-- Scroll hint -->
+      <div id="scroll-hint">
+        <span>Scroll</span>
+        <div class="line"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- NEXT SECTION -->
+  <div id="next-section">— Projects —</div>
+
+  <script>
+    /* ── Generate stars ── */
+    const starsEl = document.getElementById('stars')
+    for (let i = 0; i < 120; i++) {
+      const s = document.createElement('div')
+      s.className = 'star'
+      const size = Math.random() * 2.2 + 0.5
+      s.style.cssText = `
+        width: ${size}px;
+        height: ${size}px;
+        top: ${Math.random() * 100}%;
+        left: ${Math.random() * 100}%;
+        --d: ${(Math.random() * 3 + 1).toFixed(1)}s;
+        opacity: ${Math.random() * 0.5 + 0.1};
+      `
+      starsEl.appendChild(s)
+    }
+
+    /* ── Scroll driver ── */
+    const rig      = document.getElementById('camera-rig')
+    const vignette = document.getElementById('vignette')
+    const hint     = document.getElementById('scroll-hint')
+    const pbar     = document.getElementById('progress-bar')
+    const sticky   = document.getElementById('hero-sticky')
+
+    function lerp(a, b, t) { return a + (b - a) * t }
+    function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)) }
+    function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3) }
+    function easeInOutQuad(t) { return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2 }
+
+    function onScroll() {
+      const scrollY   = window.scrollY
+      const totalH    = sticky.offsetHeight - window.innerHeight
+      const raw       = clamp(scrollY / totalH, 0, 1)
+
+      // progress bar
+      pbar.style.width = (raw * 100) + '%'
+
+      // --- PHASE 1: Push-in (0 → 0.65) ---
+      const pushT = clamp(raw / 0.65, 0, 1)
+      const eased = easeOutCubic(pushT)
+
+      const scale   = lerp(0.32, 1.0, eased)
+      const blur    = lerp(10,   0,   eased)
+      const opacity = lerp(0.15, 1.0, eased)
+
+      // --- PHASE 2: Hold + fade out (0.65 → 1.0) ---
+      const exitT   = clamp((raw - 0.65) / 0.35, 0, 1)
+      const exitE   = easeInOutQuad(exitT)
+
+      const finalScale   = lerp(scale,   1.18, exitE)
+      const finalBlur    = lerp(blur,    8,    exitE)
+      const finalOpacity = lerp(opacity, 0,    exitE)
+
+      rig.style.transform = `scale(${finalScale}) translateZ(0)`
+      rig.style.filter    = `blur(${finalBlur.toFixed(2)}px)`
+      rig.style.opacity   = finalOpacity.toFixed(3)
+
+      // Vignette tightens during push-in, relaxes on exit
+      const vigSize = lerp(55, 25, eased)
+      vignette.style.background = `radial-gradient(
+        ellipse at center,
+        transparent 0%,
+        rgba(4,6,14,0.55) ${vigSize}%,
+        rgba(4,6,14,0.97) 100%
+      )`
+
+      // Stars drift away slightly
+      starsEl.style.transform = `scale(${lerp(1, 1.12, eased)}) translateZ(0)`
+      starsEl.style.opacity = lerp(1, 0.3, exitE)
+
+      // Hide scroll hint once moving
+      hint.style.opacity = raw < 0.05 ? 1 : 0
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    onScroll() // initial state
+  </script>
+
+</body>
+</html>

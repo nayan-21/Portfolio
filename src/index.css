@@ -60,6 +60,12 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Hide default cursor on all interactive elements */
+  a, button, input, textarea, select, label, [role="button"] {
+    cursor: none !important;
   }
 
   h1,

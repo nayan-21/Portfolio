@@ -1,28 +1,106 @@
+/* ─────────────────────────────────────────────────────────────────────────
+   Contact — Iron Man HUD Overlay
+   – Hex-grid background, corner bracket frame, sweep scan-line
+   – Contact form with sharp HUD inputs + TRANSMIT MESSAGE CTA
+   – Existing magnet social links preserved below the form
+──────────────────────────────────────────────────────────────────────────── */
 import { useRef, useState, useCallback } from 'react'
 import { motion, useInView, useMotionValue, useSpring } from 'framer-motion'
 import Section from './Section'
 
+/* ── HUD keyframe styles ── */
+const HUD_STYLES = `
+  @keyframes hud-scan {
+    0%   { top: -4px;   opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 1; }
+    100% { top: 103%;  opacity: 0; }
+  }
+  @keyframes hud-pulse-ring {
+    0%, 100% { opacity: 0.12; transform: scale(1); }
+    50%       { opacity: 0.22; transform: scale(1.06); }
+  }
+  @keyframes hud-blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+  }
+  @keyframes hud-corner-glow {
+    0%, 100% { box-shadow: 0 0 6px rgba(0,200,255,0.3); }
+    50%       { box-shadow: 0 0 14px rgba(0,200,255,0.6); }
+  }
+
+  .hud-scanline {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(0,200,255,0.35), transparent);
+    animation: hud-scan 4.5s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .hud-ring {
+    animation: hud-pulse-ring 3s ease-in-out infinite;
+  }
+
+  .hud-status-dot {
+    animation: hud-blink 2s step-start infinite;
+  }
+
+  .hud-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0,200,255,0.25);
+    outline: none;
+    width: 100%;
+    padding: 10px 0 8px;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-size: 0.88rem;
+    color: #e8e6f0;
+    transition: border-color 0.25s;
+    caret-color: #00c8ff;
+  }
+  .hud-input::placeholder { color: rgba(0,200,255,0.25); }
+  .hud-input:focus { border-bottom-color: rgba(0,200,255,0.85); }
+
+  .hud-textarea {
+    resize: none;
+    min-height: 90px;
+  }
+
+  /* Corner brackets */
+  .hud-corner {
+    position: absolute;
+    width: 16px; height: 16px;
+    border-color: rgba(0,200,255,0.6);
+    border-style: solid;
+    animation: hud-corner-glow 3s ease-in-out infinite;
+  }
+  .hud-corner-tl { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .hud-corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .hud-corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
+  .hud-corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+`
+
 /* ── SVG icons ── */
 function IconMail() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <rect x="2" y="4" width="20" height="16" rx="2" />
       <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
     </svg>
   )
 }
-
 function IconGithub() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" />
     </svg>
   )
 }
-
 function IconLinkedin() {
   return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
       <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
       <rect x="2" y="9" width="4" height="12" />
       <circle cx="4" cy="4" r="2" />
@@ -30,207 +108,293 @@ function IconLinkedin() {
   )
 }
 
-const links = [
-  {
-    id: 'email',
-    label: 'Email',
-    sub: 'nayan@example.com',
-    href: 'mailto:nayan@example.com',
-    Icon: IconMail,
-  },
-  {
-    id: 'github',
-    label: 'GitHub',
-    sub: 'github.com/nayan-21',
-    href: 'https://github.com/nayan-21',
-    Icon: IconGithub,
-  },
-  {
-    id: 'linkedin',
-    label: 'LinkedIn',
-    sub: 'linkedin.com/in/nayan',
-    href: 'https://linkedin.com/in/nayan',
-    Icon: IconLinkedin,
-  },
+const SOCIAL_LINKS = [
+  { id: 'email',    label: 'EMAIL',    val: 'nayan@example.com',       href: 'mailto:nayan@example.com',         Icon: IconMail     },
+  { id: 'github',   label: 'GITHUB',   val: 'github.com/nayan-21',     href: 'https://github.com/nayan-21',       Icon: IconGithub   },
+  { id: 'linkedin', label: 'LINKEDIN', val: 'linkedin.com/in/nayan',   href: 'https://linkedin.com/in/nayan',     Icon: IconLinkedin },
 ]
 
-/* ── MagnetLink — cursor magnet on the icon only ── */
-function MagnetLink({ link, index, isInView }) {
-  const iconRef = useRef(null)
+/* ── HUD Field ── */
+function HudField({ label, id, type = 'text', placeholder, textarea, value, onChange }) {
+  const [focused, setFocused] = useState(false)
+  const Tag = textarea ? 'textarea' : 'input'
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <label
+        htmlFor={id}
+        style={{
+          fontFamily: "'JetBrains Mono','Fira Code',monospace",
+          fontSize: '0.62rem',
+          letterSpacing: '0.18em',
+          color: focused ? 'rgba(0,200,255,0.9)' : 'rgba(0,200,255,0.45)',
+          transition: 'color 0.25s',
+          userSelect: 'none',
+        }}
+      >
+        [ {label} ]
+      </label>
+      <Tag
+        id={id}
+        type={type}
+        placeholder={placeholder}
+        className={`hud-input${textarea ? ' hud-textarea' : ''}`}
+        value={value}
+        onChange={onChange}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        rows={textarea ? 4 : undefined}
+      />
+    </div>
+  )
+}
 
-  const rawX = useMotionValue(0)
-  const rawY = useMotionValue(0)
-  const x = useSpring(rawX, { stiffness: 180, damping: 14, mass: 0.6 })
-  const y = useSpring(rawY, { stiffness: 180, damping: 14, mass: 0.6 })
-
-  const [hovered, setHovered] = useState(false)
-
-  const handleMouseMove = useCallback((e) => {
-    const rect = iconRef.current?.getBoundingClientRect()
-    if (!rect) return
-    const cx = rect.left + rect.width / 2
-    const cy = rect.top + rect.height / 2
-    rawX.set((e.clientX - cx) * 0.35)
-    rawY.set((e.clientY - cy) * 0.35)
-  }, [rawX, rawY])
-
-  const handleMouseLeave = useCallback(() => {
-    rawX.set(0)
-    rawY.set(0)
-    setHovered(false)
-  }, [rawX, rawY])
-
+/* ── Social link row ── */
+function SocialRow({ link, index, isInView }) {
+  const [hov, setHov] = useState(false)
   return (
     <motion.a
       href={link.href}
       target={link.id !== 'email' ? '_blank' : undefined}
       rel="noopener noreferrer"
-      initial={{ opacity: 0, y: 24 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={handleMouseLeave}
+      initial={{ opacity: 0, x: -16 }}
+      animate={isInView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.45, delay: 0.6 + index * 0.1 }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '1.25rem',
-        padding: '1.35rem 1.5rem',
-        borderRadius: '12px',
-        border: `1px solid ${hovered ? 'rgba(124,58,237,0.55)' : 'var(--color-border)'}`,
-        background: hovered ? 'rgba(124,58,237,0.06)' : 'transparent',
+        gap: '0.85rem',
+        padding: '0.65rem 0.9rem',
         textDecoration: 'none',
+        border: `1px solid ${hov ? 'rgba(0,200,255,0.45)' : 'rgba(0,200,255,0.12)'}`,
+        borderRadius: '4px',
+        background: hov ? 'rgba(0,200,255,0.05)' : 'transparent',
         transition: 'border-color 0.2s, background 0.2s',
-        cursor: 'pointer',
+        flex: 1,
       }}
     >
-      {/* Icon wrapper — only this moves with the magnet */}
-      <motion.div
-        ref={iconRef}
-        style={{
-          x,
-          y,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 44,
-          height: 44,
-          borderRadius: '10px',
-          background: hovered ? 'rgba(124,58,237,0.18)' : 'var(--color-surface-2)',
-          color: hovered ? 'var(--color-mystic-light)' : 'var(--color-text-muted)',
-          transition: 'background 0.2s, color 0.2s',
-          flexShrink: 0,
-        }}
-      >
+      <span style={{ color: hov ? '#00c8ff' : 'rgba(0,200,255,0.5)', transition: 'color 0.2s' }}>
         <link.Icon />
-      </motion.div>
-
-      {/* Text — stays completely still */}
+      </span>
       <div>
         <p style={{
-          fontFamily: 'var(--font-heading)',
-          fontSize: '1.05rem',
-          fontWeight: 600,
-          color: hovered ? '#fff' : 'var(--color-text)',
-          margin: '0 0 2px',
-          transition: 'color 0.2s',
-        }}>
-          {link.label}
-        </p>
+          fontFamily: "'JetBrains Mono','Fira Code',monospace",
+          fontSize: '0.6rem',
+          letterSpacing: '0.16em',
+          color: 'rgba(0,200,255,0.45)',
+          margin: '0 0 1px',
+        }}>{link.label}</p>
         <p style={{
           fontFamily: 'var(--font-sans)',
-          fontSize: '0.85rem',
-          color: 'var(--color-text-muted)',
+          fontSize: '0.82rem',
+          color: hov ? '#fff' : 'var(--color-text-muted)',
           margin: 0,
-        }}>
-          {link.sub}
-        </p>
+          transition: 'color 0.2s',
+        }}>{link.val}</p>
       </div>
-
-      {/* Arrow — right side */}
-      <svg
-        style={{
-          marginLeft: 'auto',
-          color: hovered ? 'var(--color-mystic-light)' : 'var(--color-border)',
-          transition: 'color 0.2s, transform 0.2s',
-          transform: hovered ? 'translateX(3px)' : 'translateX(0)',
-          flexShrink: 0,
-        }}
-        width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-      >
+      <svg style={{ marginLeft: 'auto', color: hov ? '#00c8ff' : 'rgba(0,200,255,0.2)', transition: 'color 0.2s, transform 0.2s', transform: hov ? 'translateX(3px)' : 'none' }}
+        width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M5 12h14M12 5l7 7-7 7" />
       </svg>
     </motion.a>
   )
 }
 
-/* ── Contact section ── */
+/* ── Hex-grid SVG background ── */
+function HexGrid() {
+  return (
+    <svg
+      aria-hidden
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.045, pointerEvents: 'none' }}
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <pattern id="hex" x="0" y="0" width="56" height="48" patternUnits="userSpaceOnUse">
+          <polygon points="28,2 52,14 52,38 28,50 4,38 4,14" fill="none" stroke="#00c8ff" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#hex)" />
+    </svg>
+  )
+}
+
+/* ── Main Component ── */
 export default function Contact() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
+  const [form, setForm] = useState({ name: '', email: '', message: '' })
+  const [status, setStatus] = useState('idle') // idle | sending | sent
+
+  const handleChange = useCallback((field) => (e) => {
+    setForm(prev => ({ ...prev, [field]: e.target.value }))
+  }, [])
+
+  function handleSubmit(e) {
+    e.preventDefault()
+    setStatus('sending')
+    // Simulate transmission delay
+    setTimeout(() => setStatus('sent'), 1800)
+  }
+
   return (
-    <Section id="contact" style={{ background: 'var(--color-surface)' }}>
-      <div
+    <Section id="contact" style={{ background: '#04060e', position: 'relative', overflow: 'hidden' }}>
+      <style>{HUD_STYLES}</style>
+
+      {/* Hex-grid bg */}
+      <HexGrid />
+
+      {/* Arc-reactor rings */}
+      <div aria-hidden style={{ position: 'absolute', top: '50%', right: '-120px', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
+        {[220, 310, 400].map((size, i) => (
+          <div key={i} className="hud-ring" style={{
+            position: 'absolute',
+            width: size, height: size,
+            borderRadius: '50%',
+            border: '1px solid rgba(0,200,255,0.12)',
+            top: '50%', left: '50%',
+            transform: 'translate(-50%,-50%)',
+            animationDelay: `${i * 0.8}s`,
+          }} />
+        ))}
+      </div>
+
+      <motion.div
         ref={ref}
-        style={{
-          maxWidth: 600,
-          margin: '0 auto',
-          textAlign: 'center',
-        }}
+        initial={{ opacity: 0, y: 32 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+        style={{ position: 'relative', zIndex: 2, maxWidth: 720, margin: '0 auto' }}
       >
-        {/* Heading */}
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          style={{ marginBottom: '3rem' }}
-        >
+        {/* ── Heading ── */}
+        <div style={{ marginBottom: '2.5rem' }}>
           <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.72rem',
-            fontWeight: 600,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase',
-            color: 'var(--color-mystic-light)',
-            marginBottom: '0.65rem',
+            fontFamily: "'JetBrains Mono','Fira Code',monospace",
+            fontSize: '0.68rem',
+            letterSpacing: '0.22em',
+            color: 'rgba(0,200,255,0.5)',
+            marginBottom: '0.5rem',
           }}>
-            Contact
+            // ESTABLISH CONTACT
           </p>
           <h2 style={{
             fontFamily: 'var(--font-heading)',
-            fontSize: 'clamp(2rem, 4vw, 3rem)',
+            fontSize: 'clamp(2rem, 4vw, 2.8rem)',
             fontWeight: 700,
             color: '#ffffff',
             margin: '0 0 0.5rem',
+            lineHeight: 1.1,
           }}>
             Send the Signal.
           </h2>
-          <div style={{
-            width: 44,
-            height: 3,
-            borderRadius: 9999,
-            background: 'var(--color-mystic)',
-            margin: '0.9rem auto 1.25rem',
-          }} />
-          <p style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '1.05rem',
-            color: 'var(--color-text-muted)',
-            lineHeight: 1.7,
-            margin: 0,
-          }}>
-            Let&apos;s build something together.
-          </p>
-        </motion.div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.75rem' }}>
+            <span className="hud-status-dot" style={{
+              width: 7, height: 7, borderRadius: '50%',
+              background: '#28c840', display: 'inline-block',
+              boxShadow: '0 0 8px rgba(40,200,64,0.7)',
+            }} />
+            <span style={{
+              fontFamily: "'JetBrains Mono','Fira Code',monospace",
+              fontSize: '0.65rem',
+              letterSpacing: '0.16em',
+              color: 'rgba(40,200,64,0.8)',
+            }}>
+              SYSTEM ONLINE — READY TO RECEIVE
+            </span>
+          </div>
+        </div>
 
-        {/* Link cards — full width, staggered in */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', textAlign: 'left' }}>
-          {links.map((link, i) => (
-            <MagnetLink key={link.id} link={link} index={i} isInView={isInView} />
+        {/* ── HUD Form panel ── */}
+        <div style={{ position: 'relative', marginBottom: '1.75rem' }}>
+          {/* Corner brackets */}
+          <span className="hud-corner hud-corner-tl" />
+          <span className="hud-corner hud-corner-tr" />
+          <span className="hud-corner hud-corner-bl" />
+          <span className="hud-corner hud-corner-br" />
+
+          {/* Scanline */}
+          <div className="hud-scanline" />
+
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              background: 'rgba(0,200,255,0.025)',
+              border: '1px solid rgba(0,200,255,0.12)',
+              borderRadius: '6px',
+              padding: '2rem 2rem 1.75rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '1.6rem',
+            }}
+          >
+            {/* Name + Email row */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <HudField id="hud-name"    label="CALLSIGN"     placeholder="Your name"    value={form.name}    onChange={handleChange('name')} />
+              <HudField id="hud-email"   label="FREQUENCY"    placeholder="your@email.com" type="email" value={form.email}   onChange={handleChange('email')} />
+            </div>
+
+            {/* Message */}
+            <HudField id="hud-msg" label="TRANSMISSION" placeholder="What's the mission?" textarea value={form.message} onChange={handleChange('message')} />
+
+            {/* Submit */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                type="submit"
+                disabled={status === 'sending' || status === 'sent'}
+                style={{
+                  fontFamily: "'JetBrains Mono','Fira Code',monospace",
+                  fontSize: '0.78rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.16em',
+                  padding: '12px 28px',
+                  borderRadius: '4px',
+                  border: status === 'sent'
+                    ? '1px solid rgba(40,200,64,0.6)'
+                    : '1px solid rgba(0,200,255,0.55)',
+                  background: status === 'sent'
+                    ? 'rgba(40,200,64,0.1)'
+                    : 'rgba(0,200,255,0.08)',
+                  color: status === 'sent' ? '#28c840' : '#00c8ff',
+                  cursor: status !== 'idle' ? 'default' : 'none',
+                  transition: 'all 0.3s',
+                  boxShadow: status === 'idle'
+                    ? '0 0 18px rgba(0,200,255,0.12), inset 0 0 12px rgba(0,200,255,0.04)'
+                    : 'none',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {status === 'idle'    && '▶  TRANSMIT MESSAGE'}
+                {status === 'sending' && '⟳  TRANSMITTING...'}
+                {status === 'sent'    && '✓  MESSAGE SENT'}
+
+                {/* Progress sweep on sending */}
+                {status === 'sending' && (
+                  <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    transition={{ duration: 1.8, ease: 'linear' }}
+                    style={{
+                      position: 'absolute', bottom: 0, left: 0, right: 0,
+                      height: 2,
+                      background: 'linear-gradient(to right, transparent, #00c8ff)',
+                      transformOrigin: 'left center',
+                    }}
+                  />
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* ── Social links ── */}
+        <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+          {SOCIAL_LINKS.map((l, i) => (
+            <SocialRow key={l.id} link={l} index={i} isInView={isInView} />
           ))}
         </div>
-      </div>
+      </motion.div>
     </Section>
   )
 }

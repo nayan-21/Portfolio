@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
+import { useRef, useState, useCallback } from 'react'
+import { motion, useInView, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import Section from './Section'
-import SpiderManSwing from './SpiderManSwing'
 
 const projects = [
   {
@@ -52,7 +51,90 @@ function IconGithub({ color }) {
   )
 }
 
-function ProjectCard({ project, index, isFeature }) {
+/* ── 3D Tilt Card wrapper ── */
+function TiltCard({ children, style, className }) {
+  const cardRef = useRef(null)
+
+  /* raw mouse position as fraction: -0.5 → +0.5 */
+  const rawX = useMotionValue(0)
+  const rawY = useMotionValue(0)
+
+  /* spring config — snappy but smooth */
+  const springCfg = { stiffness: 260, damping: 28 }
+  const springX = useSpring(rawX, springCfg)
+  const springY = useSpring(rawY, springCfg)
+
+  /* map -0.5→0.5 to ±10deg tilt */
+  const rotateY = useTransform(springX, [-0.5, 0.5], [-10, 10])
+  const rotateX = useTransform(springY, [-0.5, 0.5], [ 10, -10])
+
+  /* gloss position (%) follows mouse */
+  const glossX = useTransform(springX, [-0.5, 0.5], [20, 80])
+  const glossY = useTransform(springY, [-0.5, 0.5], [20, 80])
+
+  /* gloss opacity: 0 at rest, 0.18 when hovered */
+  const [hovered, setHovered] = useState(false)
+
+  const onMouseMove = useCallback((e) => {
+    const rect = cardRef.current?.getBoundingClientRect()
+    if (!rect) return
+    rawX.set((e.clientX - rect.left) / rect.width  - 0.5)
+    rawY.set((e.clientY - rect.top)  / rect.height - 0.5)
+  }, [rawX, rawY])
+
+  const onMouseLeave = useCallback(() => {
+    rawX.set(0)
+    rawY.set(0)
+    setHovered(false)
+  }, [rawX, rawY])
+
+  return (
+    <motion.div
+      ref={cardRef}
+      onMouseMove={onMouseMove}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={onMouseLeave}
+      style={{
+        ...style,
+        position: 'relative',
+        perspective: '900px',
+        transformStyle: 'preserve-3d',
+      }}
+    >
+      <motion.div
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: 'preserve-3d',
+        }}
+        className={className}
+      >
+        {children}
+
+        {/* Gloss overlay — radial gradient following mouse */}
+        <motion.div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 'inherit',
+            pointerEvents: 'none',
+            opacity: hovered ? 1 : 0,
+            transition: 'opacity 0.3s',
+            background: useTransform(
+              [glossX, glossY],
+              ([gx, gy]) =>
+                `radial-gradient(circle at ${gx}% ${gy}%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 65%)`
+            ),
+            zIndex: 10,
+          }}
+        />
+      </motion.div>
+    </motion.div>
+  )
+}
+
+function ProjectCard({ project, index }) {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
@@ -62,52 +144,30 @@ function ProjectCard({ project, index, isFeature }) {
       initial={{ opacity: 0, y: 48 }}
       animate={isInView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.65, delay: index * 0.12, ease: [0.22, 1, 0.36, 1] }}
-      whileHover={{ y: -5 }}
       style={{ position: 'relative' }}
     >
-      {/* Spider-Man side accent — first card only, fades in with card */}
-      {isFeature && (
-        <img
-          src="/spider_sit.jpeg"
-          alt=""
-          draggable={false}
-          loading="lazy"
-          style={{
-            position: 'absolute',
-            right: '-60px',
-            top: '58%',
-            transform: 'translateY(-50%)',
-            width: '140px',
-            height: 'auto',
-            opacity: isInView ? 0.78 : 0,
-            transition: 'opacity 0.9s ease',
-            pointerEvents: 'none',
-            userSelect: 'none',
-            zIndex: 5,
-            filter: 'drop-shadow(-4px 0 16px rgba(0,0,0,0.75))',
-          }}
-        />
-      )}
 
-      {/* Card inner */}
-      <div
-        className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
-        style={{
-          background: 'var(--color-surface)',
-          border: '1px solid var(--color-border)',
-          borderRadius: '14px',
-          transition: 'border-color 0.25s, box-shadow 0.25s',
-          cursor: 'default',
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.borderColor = 'rgba(124,58,237,0.55)'
-          e.currentTarget.style.boxShadow = '0 0 32px -8px rgba(124,58,237,0.22)'
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.borderColor = 'var(--color-border)'
-          e.currentTarget.style.boxShadow = 'none'
-        }}
-      >
+      {/* 3D Tilt wrapper */}
+      <TiltCard>
+        {/* Card inner */}
+        <div
+          className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
+          style={{
+            background: 'var(--color-surface)',
+            border: '1px solid var(--color-border)',
+            borderRadius: '14px',
+            transition: 'border-color 0.25s, box-shadow 0.25s',
+            cursor: 'default',
+          }}
+          onMouseEnter={e => {
+            e.currentTarget.style.borderColor = 'rgba(124,58,237,0.55)'
+            e.currentTarget.style.boxShadow = '0 0 32px -8px rgba(124,58,237,0.22)'
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.borderColor = 'var(--color-border)'
+            e.currentTarget.style.boxShadow = 'none'
+          }}
+        >
         {/* Left — content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
@@ -185,7 +245,8 @@ function ProjectCard({ project, index, isFeature }) {
           <ProjectButton href={project.live}  label="Live"    Icon={IconExternalLink} />
           <ProjectButton href={project.github} label="GitHub" Icon={IconGithub}       />
         </div>
-      </div>
+        </div>
+      </TiltCard>
     </motion.div>
   )
 }
@@ -239,11 +300,9 @@ export default function Projects() {
       style={{ background: 'var(--color-surface)', position: 'relative' }}
       sectionRef={sectionRef}
     >
-      {/* Spider-Man swing — triggered by viewport entry */}
-      <SpiderManSwing sectionRef={sectionRef} />
 
       {/* Heading */}
-      <div style={{ marginBottom: '3.5rem' }}>
+      <div style={{ marginBottom: '3.5rem', position: 'relative' }}>
         <p
           style={{
             fontFamily: 'var(--font-sans)',
@@ -282,7 +341,7 @@ export default function Projects() {
       {/* Vertically stacked project cards */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {projects.map((project, i) => (
-          <ProjectCard key={project.title} project={project} index={i} isFeature={i === 0} />
+          <ProjectCard key={project.title} project={project} index={i} />
         ))}
       </div>
     </Section>
