@@ -4,31 +4,42 @@ import Section from './Section'
 
 const groups = [
   {
+    category: 'Programming & CS',
+    skills: [
+      { name: 'Java (DSA)',               icon: '☕' },
+      { name: 'Python',                   icon: '🐍' },
+      { name: 'SQL',                      icon: '🗃' },
+      { name: 'Data Structures & Algo',   icon: '🧩' },
+      { name: 'OOP Concepts',             icon: '📐' },
+    ],
+  },
+  {
     category: 'Frontend',
     skills: [
-      { name: 'React',          icon: '⚛' },
-      { name: 'JavaScript',     icon: 'JS' },
-      { name: 'Tailwind CSS',   icon: '🎨' },
-      { name: 'HTML & CSS',     icon: '🖋' },
-      { name: 'Framer Motion',  icon: '✦' },
-      { name: 'Vite',           icon: '⚡' },
+      { name: 'HTML & CSS',       icon: '🖋' },
+      { name: 'JavaScript',       icon: 'JS' },
+      { name: 'React',            icon: '⚛' },
+      { name: 'Tailwind CSS',     icon: '🎨' },
     ],
   },
   {
     category: 'Backend',
     skills: [
-      { name: 'Node.js',        icon: '🔧' },
-      { name: 'REST APIs',      icon: '🔗' },
-      { name: 'Python (basics)',icon: '🐍' },
+      { name: 'Node.js',          icon: '🔧' },
+      { name: 'Express.js',       icon: '🚂' },
+      { name: 'REST APIs',        icon: '🔗' },
+      { name: 'JWT',              icon: '🔐' },
+      { name: 'MongoDB',          icon: '🍃' },
     ],
   },
   {
     category: 'Tools',
     skills: [
-      { name: 'Git & GitHub',   icon: '🔀' },
-      { name: 'VS Code',        icon: '🖥' },
-      { name: 'Figma',          icon: '▲' },
-      { name: 'npm / pnpm',     icon: '📦' },
+      { name: 'Git & GitHub',     icon: '🔀' },
+      { name: 'VS Code',          icon: '🖥' },
+      { name: 'Postman',          icon: '📮' },
+      { name: 'npm / pnpm',       icon: '📦' },
+      { name: 'Figma',            icon: '▲' },
     ],
   },
 ]

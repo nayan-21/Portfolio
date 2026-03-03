@@ -4,33 +4,37 @@ import Section from './Section'
 
 const projects = [
   {
-    title: 'RetailGuard',
-    objective: 'Detect shoplifting and anomalous behaviour in retail stores in real time.',
-    approach: 'Built a live camera-feed analysis pipeline using Python and OpenCV, wired to a React dashboard.',
-    tech: ['Python', 'FastAPI', 'OpenCV', 'React', 'WebSocket'],
-    outcome: 'Reduced manual monitoring load in a simulated demo; placed at hackathon.',
-    live: '#',
-    github: '#',
+    title: 'EduSafe',
+    hackathon: true,
+    objective: 'Create a role-based disaster awareness and safety platform for students, teachers, and administrators.',
+    approach: 'Built a JWT-authenticated web app with three user roles. Students access disaster modules with videos, notes, and quizzes, report incidents with live location, share experiences via story mode, and compete on leaderboards. Teachers monitor reports in real time; admins manage modules and quizzes dynamically.',
+    tech: ['React', 'Node.js', 'JWT', 'Tailwind CSS', 'Maps API', 'REST API'],
+    outcome: 'Delivered a secure, scalable learning and reporting system demonstrating strong frontend architecture, role-based access control, and real-world feature design.',
+    live: 'https://sih-frontend-one-mu.vercel.app/',
+    github: 'https://github.com/nayan-21/SIH',
   },
   {
     title: 'CareNavigator',
+    hackathon: true,
     objective: 'Help patients quickly find the right care pathway without sifting through noise.',
     approach: 'Designed the full frontend and integrated an LLM-powered recommendation system via REST API.',
     tech: ['React', 'Node.js', 'LangChain', 'PostgreSQL', 'Tailwind CSS'],
     outcome: 'Delivered a working prototype; sharpened my understanding of AI + UI integration.',
-    live: '#',
-    github: '#',
+    live: 'https://care-navigator-client.vercel.app/',
+    github: 'https://github.com/nayan-21/CareNavigator',
   },
   {
-    title: 'This Portfolio',
-    objective: 'A portfolio that actually reflects how I think about code and design.',
-    approach: 'Built from scratch with React + Tailwind CSS; used Framer Motion for intentional, physics-aware animation.',
-    tech: ['React', 'Tailwind CSS', 'Framer Motion', 'Vite'],
-    outcome: 'Learned to balance motion with restraint — clarity beats theatrics.',
-    live: '#',
-    github: '#',
+    title: 'RetailGuard',
+    hackathon: true,
+    objective: 'Detect shoplifting and anomalous behaviour in retail stores in real time.',
+    approach: 'Built a live camera-feed analysis pipeline using Python and OpenCV, wired to a React dashboard.',
+    tech: ['Python', 'FastAPI', 'OpenCV', 'React', 'WebSocket'],
+    outcome: 'Reduced manual monitoring load in a simulated demo; placed at hackathon.',
+    live: null,
+    github: 'https://github.com/nayan-21/HackTheSpring',
   },
 ]
+
 
 /* ── Icons (inline SVG to avoid lucide dependency issues) ── */
 function IconExternalLink({ color }) {
@@ -171,18 +175,40 @@ function ProjectCard({ project, index }) {
         {/* Left — content */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
-          {/* Title */}
-          <h3
-            style={{
-              fontFamily: 'var(--font-heading)',
-              fontSize: '1.35rem',
-              fontWeight: 700,
-              color: '#fff',
-              margin: 0,
-            }}
-          >
-            {project.title}
-          </h3>
+          {/* Title + hackathon badge */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
+            <h3
+              style={{
+                fontFamily: 'var(--font-heading)',
+                fontSize: '1.35rem',
+                fontWeight: 700,
+                color: '#fff',
+                margin: 0,
+              }}
+            >
+              {project.title}
+            </h3>
+            {project.hackathon && (
+              <span style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+                fontFamily: 'var(--font-sans)',
+                fontSize: '0.65rem',
+                fontWeight: 700,
+                letterSpacing: '0.1em',
+                textTransform: 'uppercase',
+                color: 'var(--color-gold)',
+                background: 'rgba(245,158,11,0.1)',
+                border: '1px solid rgba(245,158,11,0.35)',
+                borderRadius: 9999,
+                padding: '3px 10px',
+                boxShadow: '0 0 10px rgba(245,158,11,0.15)',
+              }}>
+                Hackathon
+              </span>
+            )}
+          </div>
 
           {/* Fields */}
           {[
@@ -241,9 +267,9 @@ function ProjectCard({ project, index }) {
         </div>
 
         {/* Right — buttons, stacked vertically */}
-        <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0">
-          <ProjectButton href={project.live}  label="Live"    Icon={IconExternalLink} />
-          <ProjectButton href={project.github} label="GitHub" Icon={IconGithub}       />
+        <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0" style={{ position: 'relative', zIndex: 20 }}>
+          {project.live && <ProjectButton href={project.live} label="Live" Icon={IconExternalLink} />}
+          <ProjectButton href={project.github} label="GitHub" Icon={IconGithub} />
         </div>
         </div>
       </TiltCard>
@@ -263,6 +289,9 @@ function ProjectButton({ href, label, Icon }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
+        cursor: 'pointer',
+        position: 'relative',
+        zIndex: 20,
         display: 'inline-flex',
         alignItems: 'center',
         gap: '0.45rem',
@@ -344,6 +373,87 @@ export default function Projects() {
           <ProjectCard key={project.title} project={project} index={i} />
         ))}
       </div>
+
+      {/* ── Coming Soon Banner ── */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-40px' }}
+        transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        style={{ marginTop: '2.5rem', position: 'relative', borderRadius: 16 }}
+      >
+        {/* Gradient glow backdrop */}
+        <div aria-hidden style={{
+          position: 'absolute', inset: -1,
+          borderRadius: 16,
+          background: 'linear-gradient(135deg, rgba(124,58,237,0.6) 0%, rgba(159,103,255,0.3) 50%, rgba(124,58,237,0.6) 100%)',
+          filter: 'blur(1px)',
+          zIndex: 0,
+        }} />
+
+        {/* Inner card */}
+        <div style={{
+          position: 'relative', zIndex: 1,
+          borderRadius: 15,
+          padding: '2.5rem 3rem',
+          background: 'linear-gradient(135deg, rgba(20,14,40,0.97) 0%, rgba(30,18,60,0.97) 100%)',
+          textAlign: 'center',
+          overflow: 'hidden',
+        }}>
+
+          {/* Subtle dot-grid texture */}
+          <div aria-hidden style={{
+            position: 'absolute', inset: 0,
+            backgroundImage: 'radial-gradient(rgba(124,58,237,0.18) 1px, transparent 1px)',
+            backgroundSize: '24px 24px',
+            pointerEvents: 'none',
+          }} />
+
+          {/* Corner glow orbs */}
+          <div aria-hidden style={{ position:'absolute', top:-60, left:-60, width:180, height:180, borderRadius:'50%', background:'rgba(124,58,237,0.12)', filter:'blur(40px)', pointerEvents:'none' }} />
+          <div aria-hidden style={{ position:'absolute', bottom:-60, right:-60, width:180, height:180, borderRadius:'50%', background:'rgba(159,103,255,0.1)', filter:'blur(40px)', pointerEvents:'none' }} />
+
+          {/* Status pill */}
+          <div style={{ display:'flex', justifyContent:'center', marginBottom:'1.25rem' }}>
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
+              padding: '5px 14px',
+              borderRadius: 9999,
+              border: '1px solid rgba(124,58,237,0.55)',
+              background: 'rgba(124,58,237,0.15)',
+              fontFamily: "'JetBrains Mono','Fira Code',monospace",
+              fontSize: '0.6rem',
+              letterSpacing: '0.2em',
+              color: 'var(--color-mystic-light)',
+              textTransform: 'uppercase',
+            }}>
+              <span style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: '#9f67ff',
+                boxShadow: '0 0 10px rgba(159,103,255,1)',
+                animation: 'pulse 1.6s ease-in-out infinite',
+              }} />
+              Actively Building
+            </span>
+          </div>
+
+          {/* Main text */}
+          <p style={{
+            position: 'relative', zIndex: 1,
+            fontFamily: 'var(--font-heading)',
+            fontSize: 'clamp(1.1rem, 2.5vw, 1.45rem)',
+            fontWeight: 700,
+            color: '#fff',
+            margin: '0 auto',
+            display: 'block',
+          }}>
+            More polished, production-ready projects are{' '}
+            <span style={{ color: 'var(--color-mystic-light)' }}>actively being built</span>{' '}
+            and will be added soon.
+          </p>
+
+        </div>
+      </motion.div>
     </Section>
   )
 }

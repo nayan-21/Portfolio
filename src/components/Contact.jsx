@@ -4,9 +4,14 @@
    – Contact form with sharp HUD inputs + TRANSMIT MESSAGE CTA
    – Existing magnet social links preserved below the form
 ──────────────────────────────────────────────────────────────────────────── */
-import { useRef, useState, useCallback } from 'react'
-import { motion, useInView, useMotionValue, useSpring } from 'framer-motion'
+import { useRef, useState } from 'react'
+import { motion, useInView } from 'framer-motion'
+import { useForm, ValidationError } from '@formspree/react'
 import Section from './Section'
+
+// ── Replace this with your Formspree form ID after registering at formspree.io ──
+// Steps: formspree.io → New Form → paste "try.nayanprajapati@gmail.com" → copy the ID (e.g. "xabcdefg")
+const FORMSPREE_ID = 'mgoljbzw'
 
 /* ── HUD keyframe styles ── */
 const HUD_STYLES = `
@@ -109,13 +114,13 @@ function IconLinkedin() {
 }
 
 const SOCIAL_LINKS = [
-  { id: 'email',    label: 'EMAIL',    val: 'nayan@example.com',       href: 'mailto:nayan@example.com',         Icon: IconMail     },
+  { id: 'email',    label: 'EMAIL',    val: 'try.nayanprajapati@gmail.com', href: 'mailto:try.nayanprajapati@gmail.com', Icon: IconMail     },
   { id: 'github',   label: 'GITHUB',   val: 'github.com/nayan-21',     href: 'https://github.com/nayan-21',       Icon: IconGithub   },
-  { id: 'linkedin', label: 'LINKEDIN', val: 'linkedin.com/in/nayan',   href: 'https://linkedin.com/in/nayan',     Icon: IconLinkedin },
+  { id: 'linkedin', label: 'LINKEDIN', val: 'linkedin.com/in/nayan-prajapati', href: 'https://www.linkedin.com/in/nayan-prajapati-a83888284/', Icon: IconLinkedin },
 ]
 
 /* ── HUD Field ── */
-function HudField({ label, id, type = 'text', placeholder, textarea, value, onChange }) {
+function HudField({ label, id, name, type = 'text', placeholder, textarea, value, onChange }) {
   const [focused, setFocused] = useState(false)
   const Tag = textarea ? 'textarea' : 'input'
   return (
@@ -135,6 +140,7 @@ function HudField({ label, id, type = 'text', placeholder, textarea, value, onCh
       </label>
       <Tag
         id={id}
+        name={name}
         type={type}
         placeholder={placeholder}
         className={`hud-input${textarea ? ' hud-textarea' : ''}`}
@@ -224,19 +230,9 @@ export default function Contact() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
-  const [status, setStatus] = useState('idle') // idle | sending | sent
-
-  const handleChange = useCallback((field) => (e) => {
-    setForm(prev => ({ ...prev, [field]: e.target.value }))
-  }, [])
-
-  function handleSubmit(e) {
-    e.preventDefault()
-    setStatus('sending')
-    // Simulate transmission delay
-    setTimeout(() => setStatus('sent'), 1800)
-  }
+  const [formspreeState, handleSubmit] = useForm(FORMSPREE_ID)
+  const succeeded = formspreeState.succeeded
+  const submitting = formspreeState.submitting
 
   return (
     <Section id="contact" style={{ background: '#04060e', position: 'relative', overflow: 'hidden' }}>
@@ -330,18 +326,24 @@ export default function Contact() {
           >
             {/* Name + Email row */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <HudField id="hud-name"    label="CALLSIGN"     placeholder="Your name"    value={form.name}    onChange={handleChange('name')} />
-              <HudField id="hud-email"   label="FREQUENCY"    placeholder="your@email.com" type="email" value={form.email}   onChange={handleChange('email')} />
+              <HudField id="hud-name"  name="name"    label="CALLSIGN"     placeholder="Your name"       />
+              <HudField id="hud-email" name="email"   label="FREQUENCY"    placeholder="your@email.com"  type="email" />
             </div>
 
             {/* Message */}
-            <HudField id="hud-msg" label="TRANSMISSION" placeholder="What's the mission?" textarea value={form.message} onChange={handleChange('message')} />
+            <HudField id="hud-msg" name="message" label="TRANSMISSION" placeholder="What's the mission?" textarea />
+
+            {/* Formspree validation errors */}
+            <ValidationError prefix="Email" field="email" errors={formspreeState.errors}
+              style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.72rem', color: '#ff6b6b', marginTop: '-0.5rem' }} />
+            <ValidationError prefix="Message" field="message" errors={formspreeState.errors}
+              style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.72rem', color: '#ff6b6b', marginTop: '-0.5rem' }} />
 
             {/* Submit */}
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 type="submit"
-                disabled={status === 'sending' || status === 'sent'}
+                disabled={submitting || succeeded}
                 style={{
                   fontFamily: "'JetBrains Mono','Fira Code',monospace",
                   fontSize: '0.78rem',
@@ -349,28 +351,28 @@ export default function Contact() {
                   letterSpacing: '0.16em',
                   padding: '12px 28px',
                   borderRadius: '4px',
-                  border: status === 'sent'
+                  border: succeeded
                     ? '1px solid rgba(40,200,64,0.6)'
                     : '1px solid rgba(0,200,255,0.55)',
-                  background: status === 'sent'
+                  background: succeeded
                     ? 'rgba(40,200,64,0.1)'
                     : 'rgba(0,200,255,0.08)',
-                  color: status === 'sent' ? '#28c840' : '#00c8ff',
-                  cursor: status !== 'idle' ? 'default' : 'none',
+                  color: succeeded ? '#28c840' : '#00c8ff',
+                  cursor: submitting || succeeded ? 'default' : 'pointer',
                   transition: 'all 0.3s',
-                  boxShadow: status === 'idle'
+                  boxShadow: !submitting && !succeeded
                     ? '0 0 18px rgba(0,200,255,0.12), inset 0 0 12px rgba(0,200,255,0.04)'
                     : 'none',
                   position: 'relative',
                   overflow: 'hidden',
                 }}
               >
-                {status === 'idle'    && '▶  TRANSMIT MESSAGE'}
-                {status === 'sending' && '⟳  TRANSMITTING...'}
-                {status === 'sent'    && '✓  MESSAGE SENT'}
+                {!submitting && !succeeded && '▶  TRANSMIT MESSAGE'}
+                {submitting                && '⟳  TRANSMITTING...'}
+                {succeeded                 && '✓  MESSAGE SENT'}
 
                 {/* Progress sweep on sending */}
-                {status === 'sending' && (
+                {submitting && (
                   <motion.div
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}

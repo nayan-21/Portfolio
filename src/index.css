@@ -64,7 +64,13 @@
   }
 
   /* Hide default cursor on all interactive elements */
-  a, button, input, textarea, select, label, [role="button"] {
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  label,
+  [role="button"] {
     cursor: none !important;
   }
 
@@ -113,6 +119,30 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
       scroll-behavior: auto !important;
+    }
+  }
+
+  /* ── Mobile responsive fixes ── */
+  @media (max-width: 640px) {
+
+    /* Prevent horizontal scroll from overflowing elements */
+    img,
+    video,
+    iframe,
+    canvas,
+    svg {
+      max-width: 100%;
+    }
+
+    /* Hamburger button: needs flex to show the 3 bars */
+    button[aria-label="Toggle menu"] {
+      display: flex !important;
+      flex-direction: column;
+    }
+
+    /* Reduce hero scroll height on mobile for better UX */
+    #home {
+      height: 200vh !important;
     }
   }
 }

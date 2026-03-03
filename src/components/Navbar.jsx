@@ -11,6 +11,15 @@ const links = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    setIsMobile(mq.matches)
+    const onMq = (e) => setIsMobile(e.matches)
+    mq.addEventListener('change', onMq)
+    return () => mq.removeEventListener('change', onMq)
+  }, [])
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24)
@@ -40,33 +49,13 @@ export default function Navbar() {
           padding: '0 32px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
+          justifyContent: 'center',
         }}
       >
-        {/* Logo */}
-        <a
-          href="#home"
-          style={{
-            fontFamily: 'var(--font-heading)',
-            fontSize: '1.4rem',
-            fontWeight: 700,
-            color: '#fff',
-            textDecoration: 'none',
-            letterSpacing: '-0.5px',
-          }}
-        >
-          <span style={{ color: 'var(--color-mystic)' }}>N</span>ayan
-          <span style={{ color: 'var(--color-mystic)', opacity: 0.5 }}>.</span>
-        </a>
-
         {/* Desktop links */}
         <nav
-          style={{
-            display: 'flex',
-            gap: '2rem',
-            alignItems: 'center',
-          }}
-          className="hidden md:flex"
+          className={undefined}
+          style={{ display: isMobile ? 'none' : 'flex', gap: '2rem', alignItems: 'center' }}
         >
           {links.map(l => (
             <a
@@ -103,24 +92,18 @@ export default function Navbar() {
             onMouseEnter={e => (e.target.style.background = 'rgba(124,58,237,0.18)')}
             onMouseLeave={e => (e.target.style.background = 'rgba(124,58,237,0.08)')}
           >
-            Hire Me
+            Let's Talk
           </a>
         </nav>
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden"
-          onClick={() => setMenuOpen(o => !o)}
-          style={{
-            background: 'none',
-            border: 'none',
-            cursor: 'pointer',
-            color: 'var(--color-text)',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 5,
-            padding: 4,
+          style={{ display: isMobile ? 'flex' : 'none',
+            background: 'none', border: 'none', cursor: 'pointer',
+            color: 'var(--color-text)', flexDirection: 'column',
+            gap: 5, padding: 4, marginLeft: 'auto',
           }}
+          onClick={() => setMenuOpen(o => !o)}
           aria-label="Toggle menu"
         >
           {[0, 1, 2].map(i => (

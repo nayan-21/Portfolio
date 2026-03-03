@@ -365,7 +365,7 @@ export default function Hero() {
               margin: 0,
             }}
           >
-            Frontend Developer &nbsp;/&nbsp; CS Student
+            Software Developer &nbsp;|&nbsp; ICT Student
           </p>
 
           {/* Name */}

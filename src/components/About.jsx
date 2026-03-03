@@ -5,16 +5,18 @@ import Section from './Section'
 /* ── Terminal lines — command + output pairs ── */
 const TERMINAL_LINES = [
   { type: 'cmd',  text: 'whoami' },
-  { type: 'out',  text: 'Nayan — CS Student & Frontend Developer' },
+  { type: 'out',  text: 'Nayan — ICT Student & Software Developer' },
   { type: 'cmd',  text: 'cat about.txt' },
-  { type: 'out',  text: "I got tired of just studying theory — so I started building." },
-  { type: 'out',  text: "My focus is the part users actually see and feel." },
+  { type: 'out',  text: "I got tired of just studying theory — so I started building real software." },
+  { type: 'out',  text: "I enjoy understanding how systems work end-to-end." },
   { type: 'cmd',  text: 'ls skills/' },
-  { type: 'out',  text: 'React   JavaScript   Python   Node.js   OpenCV   Figma' },
+  { type: 'out',  text: 'DSA   MERN   ' },
+  // { type: 'out',  text: 'React   Node.js   Express   MongoDB' },
+  // { type: 'out',  text: 'DSA   OOP' },
   { type: 'cmd',  text: 'cat highlights.txt' },
-  { type: 'out',  text: '↳ Placed at hackathon with RetailGuard' },
+  { type: 'out',  text: '↳ Participated in a hackathon with CareNavigator' },
   { type: 'out',  text: '↳ Built this portfolio from scratch' },
-  { type: 'out',  text: '↳ Building & shipping something every day' },
+  { type: 'out',  text: '↳ Consistently building and improving projects' },
   { type: 'cmd',  text: 'echo $status' },
   { type: 'out',  text: 'Open to internships & collabs ✅' },
 ]
@@ -93,12 +95,25 @@ const DP_STYLES = `
     vertical-align: text-bottom;
     animation: blink 1s step-start infinite;
   }
+  @media (max-width: 768px) {
+    .dp-char { display: none !important; }
+    .about-info-card { overflow: hidden !important; padding-top: 1.5rem !important; }
+  }
 `
 
 export default function About() {
-  const ref     = useRef(null)
+  const ref      = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-80px' })
   const { rendered, current, currentType, done } = useTypewriter(TERMINAL_LINES, isInView)
+  const [isMobile, setIsMobile] = useState(false)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)')
+    setIsMobile(mq.matches)
+    const onMq = (e) => setIsMobile(e.matches)
+    mq.addEventListener('change', onMq)
+    return () => mq.removeEventListener('change', onMq)
+  }, [])
 
   return (
     <Section id="about" style={{ background: 'var(--color-surface)' }}>
@@ -251,7 +266,9 @@ export default function About() {
 
           {/* ── RIGHT: Info card with Deadpool ── */}
           <div>
-            <div style={{
+            <div
+              className="about-info-card"
+              style={{
               position: 'relative',
               background: 'var(--color-surface-2)',
               border: '1px solid var(--color-border)',
@@ -261,12 +278,13 @@ export default function About() {
               flexDirection: 'column',
               gap: '1.5rem',
               overflow: 'visible',
-            }}>
+            }}
+            >
               {[
-                { label: 'Degree',    value: 'B.Tech — Computer Science' },
-                { label: 'Focus',     value: 'Frontend Development' },
+                { label: 'Degree',    value: 'B.E — Information & Communication Technology' },
+                { label: 'Focus',     value: 'Software Development & Problem Solving' },
                 { label: 'Currently', value: 'Building, learning, shipping' },
-                { label: 'Open to',   value: 'Internships & collabs' },
+                { label: 'Open to',   value: 'Internships & Entry-Level Roles' },
               ].map(item => (
                 <div key={item.label}>
                   <p style={{
@@ -298,6 +316,7 @@ export default function About() {
                 alt="Deadpool sitting on the card reading"
                 draggable={false}
                 style={{
+                  display: isMobile ? 'none' : 'block',
                   position: 'absolute',
                   top: '-132px',
                   right: '8px',
