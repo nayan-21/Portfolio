@@ -75,25 +75,7 @@ export default function Navbar() {
               {l.label}
             </a>
           ))}
-          <a
-            href="#contact"
-            style={{
-              fontFamily: 'var(--font-sans)',
-              fontSize: '0.875rem',
-              fontWeight: 600,
-              color: 'var(--color-mystic-light)',
-              border: '1px solid rgba(124,58,237,0.35)',
-              borderRadius: 9999,
-              padding: '8px 22px',
-              textDecoration: 'none',
-              background: 'rgba(124,58,237,0.08)',
-              transition: 'background 0.2s',
-            }}
-            onMouseEnter={e => (e.target.style.background = 'rgba(124,58,237,0.18)')}
-            onMouseLeave={e => (e.target.style.background = 'rgba(124,58,237,0.08)')}
-          >
-            Let's Talk
-          </a>
+
         </nav>
 
         {/* Mobile hamburger */}

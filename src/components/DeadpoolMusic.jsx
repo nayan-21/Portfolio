@@ -177,7 +177,7 @@ export default function DeadpoolMusic() {
       <audio ref={audioRef} src="/ambient.mp3" loop preload="auto" />
 
       <div
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-center gap-2 scale-[0.65] md:scale-90 origin-bottom-right transition-transform"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 flex flex-col items-center gap-2 scale-[0.45] md:scale-[0.60] origin-bottom-right transition-transform"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? undefined : 'translateY(16px)',
