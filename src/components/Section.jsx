@@ -1,5 +1,5 @@
-/* ─── Section helper ─────────────────────────────────────────────────────── */
-/*  Wrap each section in this to get consistent spacing + max-width.         */
+
+
 
 const SECTION_STYLES = `
   .section-inner {

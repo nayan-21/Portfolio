@@ -1,10 +1,10 @@
-/* ─── SectionHeading ─────────────────────────────────────────────────────── */
-/*  Consistent heading + accent bar for every section.                        */
+
+
 
 export default function SectionHeading({ label, title, subtitle }) {
   return (
     <div style={{ marginBottom: '3.5rem' }}>
-      {/* Eyebrow label */}
+      
       {label && (
         <p
           style={{
@@ -21,7 +21,7 @@ export default function SectionHeading({ label, title, subtitle }) {
         </p>
       )}
 
-      {/* Title */}
+      
       <h2
         style={{
           fontFamily: 'var(--font-heading)',
@@ -35,7 +35,7 @@ export default function SectionHeading({ label, title, subtitle }) {
         {title}
       </h2>
 
-      {/* Accent bar */}
+      
       <div
         style={{
           marginTop: '1rem',
@@ -46,7 +46,7 @@ export default function SectionHeading({ label, title, subtitle }) {
         }}
       />
 
-      {/* Optional subtitle */}
+      
       {subtitle && (
         <p
           style={{

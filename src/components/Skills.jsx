@@ -49,7 +49,7 @@ const groups = [
 ]
 
 
-/* Animation variants */
+
 const containerVariants = {
   hidden: {},
   visible: {
@@ -120,7 +120,7 @@ function SkillGroup({ group, index }) {
 
   return (
     <div ref={ref}>
-      {/* Group label */}
+      
       <p
         style={{
           fontFamily: 'var(--font-sans)',
@@ -135,7 +135,7 @@ function SkillGroup({ group, index }) {
         {group.category}
       </p>
 
-      {/* Staggered card grid */}
+      
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -153,7 +153,7 @@ function SkillGroup({ group, index }) {
 export default function Skills() {
   return (
     <Section id="skills">
-      {/* Heading */}
+      
       <div style={{ marginBottom: '3.5rem' }}>
         <p
           style={{
@@ -190,7 +190,7 @@ export default function Skills() {
         />
       </div>
 
-      {/* Skill groups stacked vertically with a divider */}
+      
       <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
         {groups.map((group, i) => (
           <div key={group.category}>

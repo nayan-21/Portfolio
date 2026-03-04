@@ -1,13 +1,9 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Training Arc — Vertical Timeline + HUD Skill Cards
-   – Phase timeline: glowing purple line with alternating cards
-   – Currently Training: Iron Man HUD-styled skill cards grid
-──────────────────────────────────────────────────────────────────────────── */
+
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Section from './Section'
 
-/* ── Keyframe styles ── */
+
 const ARC_STYLES = `
   @keyframes arc-glow-pulse {
     0%, 100% { box-shadow: 0 0 8px rgba(124,58,237,0.4); }
@@ -27,7 +23,7 @@ const ARC_STYLES = `
   }
 `
 
-/* ── Timeline milestones ── */
+
 const PHASES = [
   {
     phase: '01',
@@ -51,7 +47,7 @@ const PHASES = [
   },
 ]
 
-/* ── HUD Skill Cards ── */
+
 const SKILLS = [
   { icon: '🧩', title: 'DSA (Java)',              category: 'PROBLEM SOLVING', fill: 60 },
   { icon: '⚛',  title: 'React Patterns',           category: 'FRONTEND',        fill: 78 },
@@ -61,7 +57,7 @@ const SKILLS = [
   { icon: '🎯',  title: 'Clean Code Practices',     category: 'CRAFT',           fill: 58 },
 ]
 
-/* ── Timeline dot ── */
+
 function TimelineDot({ isInView, delay }) {
   return (
     <motion.div
@@ -83,7 +79,7 @@ function TimelineDot({ isInView, delay }) {
   )
 }
 
-/* ── Mobile detection hook ── */
+
 function useIsMobile() {
   const [isMobile, setIsMobile] = useState(false)
   useEffect(() => {
@@ -96,7 +92,7 @@ function useIsMobile() {
   return isMobile
 }
 
-/* ── Single phase card ── */
+
 function PhaseCard({ phase, index, isInView }) {
   const isMobile = useIsMobile()
   const isRight = !isMobile && index % 2 === 0
@@ -111,7 +107,7 @@ function PhaseCard({ phase, index, isInView }) {
         flexDirection: isRight ? 'row' : 'row-reverse',
       }}
     >
-      {/* Card */}
+      
       <motion.div
         initial={{ opacity: 0, x: isMobile ? 0 : (isRight ? -32 : 32), y: isMobile ? 20 : 0 }}
         animate={isInView ? { opacity: 1, x: 0, y: 0 } : {}}
@@ -125,7 +121,7 @@ function PhaseCard({ phase, index, isInView }) {
           position: 'relative',
         }}
       >
-        {/* Phase label */}
+        
         <p
           style={{
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
@@ -160,7 +156,7 @@ function PhaseCard({ phase, index, isInView }) {
           {phase.detail}
         </p>
 
-        {/* Connector arrow tip — hidden on mobile */}
+        
         {!isMobile && (
           <div
             style={{
@@ -178,16 +174,16 @@ function PhaseCard({ phase, index, isInView }) {
         )}
       </motion.div>
 
-      {/* Center dot */}
+      
       <TimelineDot isInView={isInView} delay={0.1 + index * 0.12} />
 
-      {/* Spacer for the other side — desktop only */}
+      
       {!isMobile && <div style={{ flex: 1 }} />}
     </div>
   )
 }
 
-/* ── HUD Skill card ── */
+
 function HudSkillCard({ skill, index, isInView }) {
   const [hov, setHov] = useState(false)
 
@@ -207,7 +203,7 @@ function HudSkillCard({ skill, index, isInView }) {
         transition: 'border-color 0.25s, background 0.25s, box-shadow 0.25s',
       }}
     >
-      {/* Icon + Category */}
+      
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.75rem' }}>
         <span style={{ fontSize: '1.4rem', lineHeight: 1 }}>{skill.icon}</span>
         <span
@@ -226,7 +222,7 @@ function HudSkillCard({ skill, index, isInView }) {
         </span>
       </div>
 
-      {/* Title */}
+      
       <p
         style={{
           fontFamily: 'var(--font-heading)',
@@ -239,7 +235,7 @@ function HudSkillCard({ skill, index, isInView }) {
         {skill.title}
       </p>
 
-      {/* Progress bar */}
+      
       <div
         style={{
           height: 3,
@@ -264,7 +260,7 @@ function HudSkillCard({ skill, index, isInView }) {
   )
 }
 
-/* ── Main component ── */
+
 export default function Learning() {
   const timelineRef = useRef(null)
   const cardsRef    = useRef(null)
@@ -276,7 +272,7 @@ export default function Learning() {
     <Section id="learning">
       <style>{ARC_STYLES}</style>
 
-      {/* ── Heading ── */}
+      
       <div style={{ marginBottom: '4rem' }}>
         <p
           style={{
@@ -325,11 +321,9 @@ export default function Learning() {
         </p>
       </div>
 
-      {/* ══════════════════════════════════════════
-          PART 1 — VERTICAL TIMELINE
-      ══════════════════════════════════════════ */}
+      
       <div ref={timelineRef} style={{ marginBottom: '5rem' }}>
-        {/* Sub-heading */}
+        
         <p
           style={{
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
@@ -342,10 +336,10 @@ export default function Learning() {
           // THE ARC SO FAR
         </p>
 
-        {/* Timeline wrapper — relative for the vertical line */}
+        
         <div style={{ position: 'relative' }}>
 
-          {/* Glowing vertical line */}
+          
           <motion.div
             initial={{ scaleY: 0 }}
             animate={timelineInView ? { scaleY: 1 } : {}}
@@ -363,7 +357,7 @@ export default function Learning() {
             }}
           />
 
-          {/* Phase cards */}
+          
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {PHASES.map((phase, i) => (
               <PhaseCard
@@ -377,11 +371,9 @@ export default function Learning() {
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════
-          PART 2 — HUD SKILL CARDS
-      ══════════════════════════════════════════ */}
+      
       <div ref={cardsRef}>
-        {/* Sub-heading */}
+        
         <p
           style={{
             fontFamily: "'JetBrains Mono','Fira Code',monospace",

@@ -7,11 +7,10 @@ import Projects from './components/Projects'
 import Learning from './components/Learning'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
-import DeadpoolMusic from './components/DeadpoolMusic'
 import CustomCursor from './components/CustomCursor'
 import Preloader from './components/Preloader'
 
-/* Show preloader once per browser session */
+
 const alreadySeen = sessionStorage.getItem('pl_seen')
 
 function App() {
@@ -24,7 +23,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-[--color-bg] text-[--color-text]" style={{ cursor: 'none' }}>
-      {/* Preloader sits above everything, removes itself when done */}
+      
       {showPreloader && (
         <Preloader onDone={handlePreloaderDone} />
       )}
@@ -39,7 +38,6 @@ function App() {
         <Learning />
         <Contact />
       </main>
-      <DeadpoolMusic />
       <Footer />
     </div>
   )

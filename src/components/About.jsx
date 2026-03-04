@@ -2,7 +2,7 @@ import { motion, useInView } from 'framer-motion'
 import { useRef, useEffect, useState } from 'react'
 import Section from './Section'
 
-/* ── Terminal lines — command + output pairs ── */
+
 const TERMINAL_LINES = [
   { type: 'cmd',  text: 'whoami' },
   { type: 'out',  text: 'Nayan — ICT Student & Software Developer' },
@@ -11,8 +11,6 @@ const TERMINAL_LINES = [
   { type: 'out',  text: "I enjoy understanding how systems work end-to-end." },
   { type: 'cmd',  text: 'ls skills/' },
   { type: 'out',  text: 'DSA   MERN   ' },
-  // { type: 'out',  text: 'React   Node.js   Express   MongoDB' },
-  // { type: 'out',  text: 'DSA   OOP' },
   { type: 'cmd',  text: 'cat highlights.txt' },
   { type: 'out',  text: '↳ Participated in a hackathon with CareNavigator' },
   { type: 'out',  text: '↳ Built this portfolio from scratch' },
@@ -21,14 +19,14 @@ const TERMINAL_LINES = [
   { type: 'out',  text: 'Open to internships & collabs ✅' },
 ]
 
-const CHAR_SPEED_CMD = 38   // ms per char for commands
-const CHAR_SPEED_OUT = 12   // ms per char for output
-const LINE_PAUSE     = 280  // ms pause between lines
+const CHAR_SPEED_CMD = 38
+const CHAR_SPEED_OUT = 12
+const LINE_PAUSE     = 280
 
-/* ── Typewriter hook ── */
+
 function useTypewriter(lines, active) {
-  const [rendered, setRendered] = useState([])   // fully completed lines
-  const [current, setCurrent]   = useState('')   // line being typed
+  const [rendered, setRendered] = useState([])
+  const [current, setCurrent]   = useState('')
   const [lineIdx, setLineIdx]   = useState(0)
   const [charIdx, setCharIdx]   = useState(0)
   const [done, setDone]         = useState(false)
@@ -47,7 +45,6 @@ function useTypewriter(lines, active) {
       }, speed)
       return () => clearTimeout(t)
     } else {
-      // line finished — push to rendered, move on
       const t = setTimeout(() => {
         setRendered(prev => [...prev, { type: line.type, text: line.text }])
         setCurrent('')
@@ -61,7 +58,7 @@ function useTypewriter(lines, active) {
   return { rendered, current, currentType: lines[lineIdx]?.type, done }
 }
 
-/* ── Deadpool animation styles ── */
+
 const DP_STYLES = `
   @keyframes dp-breathe {
     0%, 100% { transform: scaleY(1);      }
@@ -125,7 +122,7 @@ export default function About() {
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        {/* Heading block */}
+        
         <div style={{ marginBottom: '3rem' }}>
           <p style={{
             fontFamily: 'var(--font-sans)',
@@ -157,10 +154,10 @@ export default function About() {
           }} />
         </div>
 
-        {/* Content — two-column */}
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14 items-start">
 
-          {/* ── LEFT: Terminal window ── */}
+          
           <div style={{
             background: '#0b0d17',
             border: '1px solid rgba(0,200,255,0.18)',
@@ -169,7 +166,7 @@ export default function About() {
             boxShadow: '0 0 40px -10px rgba(0,200,255,0.08), 0 8px 32px rgba(0,0,0,0.5)',
             fontFamily: '"JetBrains Mono", "Fira Code", "Cascadia Code", monospace',
           }}>
-            {/* Title bar */}
+            
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -178,7 +175,7 @@ export default function About() {
               background: '#141620',
               borderBottom: '1px solid rgba(0,200,255,0.1)',
             }}>
-              {/* Traffic lights */}
+              
               {['#ff5f57','#febc2e','#28c840'].map((c, i) => (
                 <span key={i} style={{
                   width: 12, height: 12,
@@ -198,7 +195,7 @@ export default function About() {
               </span>
             </div>
 
-            {/* Terminal body */}
+            
             <div style={{
               padding: '1.2rem 1.4rem',
               display: 'flex',
@@ -206,7 +203,7 @@ export default function About() {
               gap: '0.25rem',
               minHeight: '260px',
             }}>
-              {/* Completed lines */}
+              
               {rendered.map((line, i) => (
                 <div key={i} style={{
                   display: 'flex',
@@ -225,7 +222,7 @@ export default function About() {
                 </div>
               ))}
 
-              {/* Currently typing line */}
+              
               {!done && current !== undefined && (
                 <div style={{
                   display: 'flex',
@@ -247,7 +244,7 @@ export default function About() {
                 </div>
               )}
 
-              {/* Idle cursor after all done */}
+              
               {done && (
                 <div style={{
                   display: 'flex',
@@ -264,7 +261,7 @@ export default function About() {
             </div>
           </div>
 
-          {/* ── RIGHT: Info card with Deadpool ── */}
+          
           <div>
             <div
               className="about-info-card"
@@ -309,7 +306,7 @@ export default function About() {
                 </div>
               ))}
 
-              {/* ── Deadpool — unchanged ── */}
+              
               <img
                 className="dp-char"
                 src="/deadpool_new.png"

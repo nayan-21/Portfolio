@@ -1,14 +1,8 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Preloader
-   – Full-screen cinematic loading screen shown once per session
-   – Animated percentage counter + glowing progress bar
-   – Logo "N." appears with a character-reveal animation
-   – Exits with a vertical curtain wipe revealing the site beneath
-──────────────────────────────────────────────────────────────────────────── */
+
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
-/* ── CSS injected once ── */
+
 const PRELOADER_STYLES = `
   @keyframes pl-scan {
     0%   { transform: translateX(-100%); }
@@ -30,19 +24,19 @@ const PRELOADER_STYLES = `
 
 export default function Preloader({ onDone }) {
   const [progress, setProgress] = useState(0)
-  const [phase, setPhase]       = useState('loading') // loading | exiting
+  const [phase, setPhase]       = useState('loading')
 
-  /* ── Simulate loading progress ── */
+  
   useEffect(() => {
     let p = 0
     const interval = setInterval(() => {
-      /* accelerate at start, slow in the middle, fast again at end */
+      
       const step = p < 30 ? 3.2 : p < 70 ? 1.2 : 2.8
       p = Math.min(100, p + step + Math.random() * 1.5)
       setProgress(Math.floor(p))
       if (p >= 100) {
         clearInterval(interval)
-        /* small pause at 100% before the wipe exit */
+        
         setTimeout(() => setPhase('exiting'), 420)
       }
     }, 42)
@@ -70,17 +64,17 @@ export default function Preloader({ onDone }) {
         >
           <style>{PRELOADER_STYLES}</style>
 
-          {/* ── Curtain panels that wipe upward on exit ── */}
+          
           <CurtainExit trigger={phase === 'exiting'} onDone={onDone} />
 
-          {/* ── Logo ── */}
+          
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             style={{ marginBottom: '3.5rem', textAlign: 'center' }}
           >
-            {/* Large "N." character reveal */}
+            
             <div style={{ position: 'relative', display: 'inline-block' }}>
               <span
                 style={{
@@ -110,7 +104,7 @@ export default function Preloader({ onDone }) {
                 .
               </motion.span>
 
-              {/* Glow behind the logo */}
+              
               <div style={{
                 position: 'absolute',
                 inset: '-20px',
@@ -122,7 +116,7 @@ export default function Preloader({ onDone }) {
               }} />
             </div>
 
-            {/* Subtitle */}
+            
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -141,14 +135,14 @@ export default function Preloader({ onDone }) {
             </motion.p>
           </motion.div>
 
-          {/* ── Progress block ── */}
+          
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
             style={{ width: 'min(320px, 75vw)' }}
           >
-            {/* Percentage */}
+            
             <div style={{
               display: 'flex',
               justifyContent: 'space-between',
@@ -173,7 +167,7 @@ export default function Preloader({ onDone }) {
               </span>
             </div>
 
-            {/* Track */}
+            
             <div style={{
               position: 'relative',
               width: '100%',
@@ -182,7 +176,7 @@ export default function Preloader({ onDone }) {
               borderRadius: 9999,
               overflow: 'hidden',
             }}>
-              {/* Fill */}
+              
               <motion.div
                 style={{
                   position: 'absolute',
@@ -194,7 +188,7 @@ export default function Preloader({ onDone }) {
                   transition: 'width 0.1s linear',
                 }}
               />
-              {/* Shine sweep */}
+              
               <div className="pl-bar-shine" />
             </div>
           </motion.div>
@@ -204,13 +198,13 @@ export default function Preloader({ onDone }) {
   )
 }
 
-/* ── Curtain wipe — two panels slide up to reveal site ── */
+
 function CurtainExit({ trigger, onDone }) {
   return (
     <AnimatePresence>
       {trigger && (
         <>
-          {/* Left panel */}
+          
           <motion.div
             key="curtain-l"
             initial={{ y: 0 }}
@@ -226,7 +220,7 @@ function CurtainExit({ trigger, onDone }) {
               zIndex: 10000,
             }}
           />
-          {/* Right panel — slight delay for stagger */}
+          
           <motion.div
             key="curtain-r"
             initial={{ y: 0 }}

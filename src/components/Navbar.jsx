@@ -52,7 +52,7 @@ export default function Navbar() {
           justifyContent: 'center',
         }}
       >
-        {/* Desktop links */}
+        
         <nav
           className={undefined}
           style={{ display: isMobile ? 'none' : 'flex', gap: '2rem', alignItems: 'center' }}
@@ -78,7 +78,7 @@ export default function Navbar() {
 
         </nav>
 
-        {/* Mobile hamburger */}
+        
         <button
           style={{ display: isMobile ? 'flex' : 'none',
             background: 'none', border: 'none', cursor: 'pointer',
@@ -112,7 +112,7 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile dropdown */}
+      
       {menuOpen && (
         <div
           style={{

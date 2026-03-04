@@ -11,7 +11,7 @@ export default function AmbientMode() {
 
   const TARGET_VOLUME = 0.15
   const FADE_STEPS = 25
-  const FADE_STEP_DURATION = 60 // 1.5 seconds fade
+  const FADE_STEP_DURATION = 60
 
   useEffect(() => {
     return () => {
@@ -28,7 +28,6 @@ export default function AmbientMode() {
     }
 
     if (isPlaying) {
-      // Fade out
       setIsPlaying(false)
       let currentVol = audio.volume
       const step = currentVol / FADE_STEPS
@@ -44,7 +43,6 @@ export default function AmbientMode() {
         }
       }, FADE_STEP_DURATION)
     } else {
-      // Fade in
       setIsPlaying(true)
       setHasError(false)
       audio.volume = 0
@@ -112,7 +110,7 @@ export default function AmbientMode() {
           }}
           aria-label="Toggle Ambient Mode"
         >
-          {/* Animated Equalizer Icon */}
+          
           <div style={{ position: 'relative', width: 14, height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <AnimatePresence mode="popLayout">
               {isPlaying && !hasError ? (

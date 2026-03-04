@@ -36,7 +36,7 @@ const projects = [
 ]
 
 
-/* ── Icons (inline SVG to avoid lucide dependency issues) ── */
+
 function IconExternalLink({ color }) {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -55,28 +55,28 @@ function IconGithub({ color }) {
   )
 }
 
-/* ── 3D Tilt Card wrapper ── */
+
 function TiltCard({ children, style, className }) {
   const cardRef = useRef(null)
 
-  /* raw mouse position as fraction: -0.5 → +0.5 */
+  
   const rawX = useMotionValue(0)
   const rawY = useMotionValue(0)
 
-  /* spring config — snappy but smooth */
+  
   const springCfg = { stiffness: 260, damping: 28 }
   const springX = useSpring(rawX, springCfg)
   const springY = useSpring(rawY, springCfg)
 
-  /* map -0.5→0.5 to ±10deg tilt */
+  
   const rotateY = useTransform(springX, [-0.5, 0.5], [-10, 10])
   const rotateX = useTransform(springY, [-0.5, 0.5], [ 10, -10])
 
-  /* gloss position (%) follows mouse */
+  
   const glossX = useTransform(springX, [-0.5, 0.5], [20, 80])
   const glossY = useTransform(springY, [-0.5, 0.5], [20, 80])
 
-  /* gloss opacity: 0 at rest, 0.18 when hovered */
+  
   const [hovered, setHovered] = useState(false)
 
   const onMouseMove = useCallback((e) => {
@@ -115,7 +115,7 @@ function TiltCard({ children, style, className }) {
       >
         {children}
 
-        {/* Gloss overlay — radial gradient following mouse */}
+        
         <motion.div
           aria-hidden
           style={{
@@ -151,9 +151,9 @@ function ProjectCard({ project, index }) {
       style={{ position: 'relative' }}
     >
 
-      {/* 3D Tilt wrapper */}
+      
       <TiltCard>
-        {/* Card inner */}
+        
         <div
           className="flex flex-col md:grid md:grid-cols-[1fr_auto] gap-6 items-start p-6 md:p-9"
           style={{
@@ -172,10 +172,10 @@ function ProjectCard({ project, index }) {
             e.currentTarget.style.boxShadow = 'none'
           }}
         >
-        {/* Left — content */}
+        
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
 
-          {/* Title + hackathon badge */}
+          
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', flexWrap: 'wrap' }}>
             <h3
               style={{
@@ -210,7 +210,7 @@ function ProjectCard({ project, index }) {
             )}
           </div>
 
-          {/* Fields */}
+          
           {[
             { label: 'Objective', value: project.objective },
             { label: 'Approach',  value: project.approach  },
@@ -244,7 +244,7 @@ function ProjectCard({ project, index }) {
             </div>
           ))}
 
-          {/* Tech tags */}
+          
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.25rem' }}>
             {project.tech.map(t => (
               <span
@@ -266,7 +266,7 @@ function ProjectCard({ project, index }) {
           </div>
         </div>
 
-        {/* Right — buttons, stacked vertically */}
+        
         <div className="flex flex-row md:flex-col gap-3 md:items-end w-full md:w-auto pt-1 mt-2 md:mt-0" style={{ position: 'relative', zIndex: 20 }}>
           {project.live && <ProjectButton href={project.live} label="Live" Icon={IconExternalLink} />}
           <ProjectButton href={project.github} label="GitHub" Icon={IconGithub} />
@@ -277,7 +277,7 @@ function ProjectCard({ project, index }) {
   )
 }
 
-/* Button component — gold icon only on hover */
+
 function ProjectButton({ href, label, Icon }) {
   const [hovered, setHovered] = useToggle()
 
@@ -308,14 +308,14 @@ function ProjectButton({ href, label, Icon }) {
         whiteSpace: 'nowrap',
       }}
     >
-      {/* Icon turns gold on hover */}
+      
       <Icon color={hovered ? 'var(--color-gold)' : 'currentColor'} />
       {label}
     </a>
   )
 }
 
-/* Tiny hook for hover toggle */
+
 function useToggle() {
   return useState(false)
 }
@@ -330,7 +330,7 @@ export default function Projects() {
       sectionRef={sectionRef}
     >
 
-      {/* Heading */}
+      
       <div style={{ marginBottom: '3.5rem', position: 'relative' }}>
         <p
           style={{
@@ -367,14 +367,14 @@ export default function Projects() {
         />
       </div>
 
-      {/* Vertically stacked project cards */}
+      
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
         {projects.map((project, i) => (
           <ProjectCard key={project.title} project={project} index={i} />
         ))}
       </div>
 
-      {/* ── Coming Soon Banner ── */}
+      
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -382,7 +382,7 @@ export default function Projects() {
         transition={{ duration: 0.7, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
         style={{ marginTop: '2.5rem', position: 'relative', borderRadius: 16 }}
       >
-        {/* Gradient glow backdrop */}
+        
         <div aria-hidden style={{
           position: 'absolute', inset: -1,
           borderRadius: 16,
@@ -391,7 +391,7 @@ export default function Projects() {
           zIndex: 0,
         }} />
 
-        {/* Inner card */}
+        
         <div style={{
           position: 'relative', zIndex: 1,
           borderRadius: 15,
@@ -401,7 +401,7 @@ export default function Projects() {
           overflow: 'hidden',
         }}>
 
-          {/* Subtle dot-grid texture */}
+          
           <div aria-hidden style={{
             position: 'absolute', inset: 0,
             backgroundImage: 'radial-gradient(rgba(124,58,237,0.18) 1px, transparent 1px)',
@@ -409,11 +409,11 @@ export default function Projects() {
             pointerEvents: 'none',
           }} />
 
-          {/* Corner glow orbs */}
+          
           <div aria-hidden style={{ position:'absolute', top:-60, left:-60, width:180, height:180, borderRadius:'50%', background:'rgba(124,58,237,0.12)', filter:'blur(40px)', pointerEvents:'none' }} />
           <div aria-hidden style={{ position:'absolute', bottom:-60, right:-60, width:180, height:180, borderRadius:'50%', background:'rgba(159,103,255,0.1)', filter:'blur(40px)', pointerEvents:'none' }} />
 
-          {/* Status pill */}
+          
           <div style={{ display:'flex', justifyContent:'center', marginBottom:'1.25rem' }}>
             <span style={{
               display: 'inline-flex', alignItems: 'center', gap: '0.45rem',
@@ -437,7 +437,7 @@ export default function Projects() {
             </span>
           </div>
 
-          {/* Main text */}
+          
           <p style={{
             position: 'relative', zIndex: 1,
             fontFamily: 'var(--font-heading)',

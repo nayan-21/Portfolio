@@ -1,20 +1,14 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Hero — Cinematic Camera Push-In (Option 4)
-   – 300vh sticky scroll container drives a pure-CSS 3D effect
-   – Text starts small + blurry (far away), rushes toward viewer on scroll
-   – Vignette tightens during push-in, fades out as hero exits
-   – Stars parallax drift subtly with scroll
-──────────────────────────────────────────────────────────────────────────── */
+
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 
-/* ── tiny helpers ── */
+
 const lerp   = (a, b, t) => a + (b - a) * t
 const clamp  = (v, lo, hi) => Math.max(lo, Math.min(hi, v))
 const easeOutCubic   = t => 1 - Math.pow(1 - t, 3)
 const easeInOutQuad  = t => t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2
 
-/* ── Aurora + Particle CSS keyframes ── */
+
 const AURORA_STYLES = `
   @keyframes aurora-drift-1 {
     0%   { transform: translate(0%,    0%)   scale(1);    }
@@ -51,7 +45,7 @@ const AURORA_STYLES = `
   }
 `
 
-/* ── Aurora blob definitions — smaller sizes + lower blur for perf ── */
+
 const AURORA_BLOBS = [
   {
     id: 0,
@@ -87,7 +81,7 @@ const AURORA_BLOBS = [
   },
 ]
 
-/* ── Particle data — 35 particles, no box-shadow for perf ── */
+
 const rnd = (lo, hi) => lo + Math.random() * (hi - lo)
 const PARTICLES = Array.from({ length: 35 }, (_, i) => ({
   id: i,
@@ -101,7 +95,7 @@ const PARTICLES = Array.from({ length: 35 }, (_, i) => ({
   hue:    Math.random() > 0.45 ? '0,200,255' : '168,85,247',
 }))
 
-/* ── star data (generated once) ── */
+
 const STARS = Array.from({ length: 110 }, (_, i) => ({
   id: i,
   top:    `${Math.random() * 100}%`,
@@ -112,13 +106,13 @@ const STARS = Array.from({ length: 110 }, (_, i) => ({
 }))
 
 export default function Hero() {
-  const stickyRef  = useRef(null)  // the 300vh wrapper
-  const rigRef     = useRef(null)  // camera rig (scales/blurs)
-  const vigRef     = useRef(null)  // vignette overlay
-  const starsRef   = useRef(null)  // star layer
-  const hintRef    = useRef(null)  // scroll hint
-  const auroraRef  = useRef(null)  // aurora wrapper (parallax)
-  const particleRef = useRef(null) // particle wrapper (fade on exit)
+  const stickyRef  = useRef(null)
+  const rigRef     = useRef(null)
+  const vigRef     = useRef(null)
+  const starsRef   = useRef(null)
+  const hintRef    = useRef(null)
+  const auroraRef  = useRef(null)
+  const particleRef = useRef(null)
 
   useEffect(() => {
     const rig      = rigRef.current
@@ -136,7 +130,7 @@ export default function Hero() {
       if (totalH <= 0) return
       const raw = clamp(scrollY / totalH, 0, 1)
 
-      /* ── Phase 1: push-in (0 → 0.65 of travel) ── */
+      
       const pushT = clamp(raw / 0.65, 0, 1)
       const eased = easeOutCubic(pushT)
 
@@ -144,7 +138,7 @@ export default function Hero() {
       const blur     = lerp(12,   0,   eased)
       const opacity  = lerp(0.12, 1.0, eased)
 
-      /* ── Phase 2: overshoot + fade out (0.65 → 1.0) ── */
+      
       const exitT   = clamp((raw - 0.65) / 0.35, 0, 1)
       const exitE   = easeInOutQuad(exitT)
 
@@ -156,7 +150,7 @@ export default function Hero() {
       rig.style.filter    = `blur(${finalBlur.toFixed(2)}px)`
       rig.style.opacity   = finalOpacity.toFixed(4)
 
-      /* ── Vignette: tightens on push-in ── */
+      
       const vigStop = lerp(58, 24, eased)
       vig.style.background = `radial-gradient(
         ellipse at center,
@@ -165,38 +159,38 @@ export default function Hero() {
         rgba(4,6,14,0.97) 100%
       )`
 
-      /* ── Stars drift outward as camera pushes ── */
+      
       stars.style.transform = `scale(${lerp(1, 1.14, eased).toFixed(4)}) translateZ(0)`
       stars.style.opacity   = lerp(1, 0.25, exitE).toFixed(3)
 
-      /* ── Aurora: slow counter-parallax + fade on exit ── */
+      
       if (aurora) {
         aurora.style.transform = `translateY(${lerp(0, -40, eased).toFixed(1)}px) scale(${lerp(1, 1.08, eased).toFixed(4)})`
         aurora.style.opacity   = lerp(1, 0, exitE).toFixed(3)
       }
 
-      /* ── Particles: fade out with aurora on exit ── */
+      
       if (particles) {
         particles.style.opacity = lerp(1, 0, exitE).toFixed(3)
       }
 
-      /* ── Scroll hint fades quickly ── */
+      
       hint.style.opacity = raw < 0.04 ? '1' : '0'
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
-    onScroll() // set initial state
+    onScroll()
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   return (
-    /* ── 300vh sticky wrapper — provides scroll travel ── */
+    
     <div
       id="home"
       ref={stickyRef}
       style={{ position: 'relative', height: '300vh' }}
     >
-      {/* ── Sticky panel — stays fixed during scroll travel ── */}
+      
       <div
         style={{
           position: 'sticky',
@@ -210,10 +204,10 @@ export default function Hero() {
           justifyContent: 'center',
         }}
       >
-        {/* ── Aurora & Particle styles ── */}
+        
         <style>{AURORA_STYLES}</style>
 
-        {/* ── Layer 0: Aurora blobs ── */}
+        
         <div
           ref={auroraRef}
           aria-hidden
@@ -239,7 +233,7 @@ export default function Hero() {
                 background: blob.color,
                 filter: `blur(${blob.blur}px)`,
                 animation: blob.animation,
-                /* each blob gets its own GPU compositor layer */
+                
                 transform: 'translateZ(0)',
                 willChange: 'transform',
                 pointerEvents: 'none',
@@ -248,7 +242,7 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* ── Layer 1: Stars ── */}
+        
         <div
           ref={starsRef}
           aria-hidden
@@ -279,7 +273,7 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* ── Layer 2: Floating particles ── */}
+        
         <div
           ref={particleRef}
           aria-hidden
@@ -303,7 +297,7 @@ export default function Hero() {
                 width:  p.size,
                 height: p.size,
                 borderRadius: '50%',
-                /* no boxShadow — eliminates per-particle GPU overdraw */
+                
                 background: `rgba(${p.hue}, ${p.op})`,
                 '--p-op': p.op,
                 '--p-dx': p.dx,
@@ -315,7 +309,7 @@ export default function Hero() {
           ))}
         </div>
 
-        {/* ── Vignette ── */}
+        
         <div
           ref={vigRef}
           aria-hidden
@@ -333,7 +327,7 @@ export default function Hero() {
           }}
         />
 
-        {/* ── Camera Rig — the push-in target ── */}
+        
         <div
           ref={rigRef}
           style={{
@@ -347,13 +341,13 @@ export default function Hero() {
             maxWidth: 760,
             padding: '0 2rem',
             willChange: 'transform, filter, opacity',
-            /* initial pushed-away state — JS will animate from here */
+            
             transform: 'scale(0.30) translateZ(0)',
             filter: 'blur(12px)',
             opacity: 0.12,
           }}
         >
-          {/* Eyebrow */}
+          
           <p
             style={{
               fontFamily: 'var(--font-sans)',
@@ -368,7 +362,7 @@ export default function Hero() {
             Software Developer &nbsp;|&nbsp; ICT Student
           </p>
 
-          {/* Name */}
+          
           <h1
             style={{
               fontFamily: 'var(--font-heading)',
@@ -383,7 +377,7 @@ export default function Hero() {
             Nayan
           </h1>
 
-          {/* Main line */}
+          
           <p
             style={{
               fontFamily: 'var(--font-heading)',
@@ -398,7 +392,7 @@ export default function Hero() {
             "Every developer has an origin story."
           </p>
 
-          {/* Supporting line */}
+          
           <p
             style={{
               fontFamily: 'var(--font-sans)',
@@ -413,9 +407,9 @@ export default function Hero() {
             then building them better than before.
           </p>
 
-          {/* CTAs */}
+          
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center', marginTop: '0.5rem' }}>
-            {/* Primary */}
+            
             <a
               href="#projects"
               style={{
@@ -445,7 +439,7 @@ export default function Hero() {
               View My Work
             </a>
 
-            {/* Ghost */}
+            
             <a
               href="#contact"
               style={{
@@ -469,7 +463,7 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* ── Scroll hint ── */}
+        
         <div
           ref={hintRef}
           style={{

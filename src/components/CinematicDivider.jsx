@@ -1,10 +1,4 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   CinematicDivider
-   – Full-width visual transition between Skills and Projects
-   – Uses DEADPOOL_UPSIDE-DOWN_DIVIDER.jpeg (portrait, rotated -90° to landscape)
-   – Static image, dark overlay, one subtle line of text
-   – No animation, no interaction, no sound
-──────────────────────────────────────────────────────────────────────────── */
+
 export default function CinematicDivider() {
   return (
     <div
@@ -20,7 +14,7 @@ export default function CinematicDivider() {
         background: '#04060e',
       }}
     >
-      {/* ── Deadpool image — portrait rotated -90° to read as wide landscape ── */}
+      
       <div
         style={{
           position: 'absolute',
@@ -50,7 +44,7 @@ export default function CinematicDivider() {
         />
       </div>
 
-      {/* ── Cinematic dark overlay 65% ── */}
+      
       <div
         style={{
           position: 'absolute',
@@ -68,7 +62,7 @@ export default function CinematicDivider() {
         }}
       />
 
-      {/* ── Single subtle text line ── */}
+      
       <p
         style={{
           position: 'relative',

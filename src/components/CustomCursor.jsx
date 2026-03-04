@@ -1,14 +1,8 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   CustomCursor
-   – Dot: snaps instantly to mouse position (cyan glow)
-   – Ring: trails behind with lerp lag for smooth feel
-   – On hover over links/buttons: ring expands + blends into element
-   – Hidden on touch devices
-──────────────────────────────────────────────────────────────────────────── */
+
 import { useEffect, useRef, useState } from 'react'
 
-const LERP_FACTOR = 0.10   // ring lag — lower = more lag
-const HOVER_SCALE  = 2.6   // ring scale on interactive hover
+const LERP_FACTOR = 0.10
+const HOVER_SCALE  = 2.6
 
 export default function CustomCursor() {
   const dotRef  = useRef(null)

@@ -1,19 +1,12 @@
-/* ─────────────────────────────────────────────────────────────────────────
-   Contact — Iron Man HUD Overlay
-   – Hex-grid background, corner bracket frame, sweep scan-line
-   – Contact form with sharp HUD inputs + TRANSMIT MESSAGE CTA
-   – Existing magnet social links preserved below the form
-──────────────────────────────────────────────────────────────────────────── */
+
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useForm, ValidationError } from '@formspree/react'
 import Section from './Section'
 
-// ── Replace this with your Formspree form ID after registering at formspree.io ──
-// Steps: formspree.io → New Form → paste "try.nayanprajapati@gmail.com" → copy the ID (e.g. "xabcdefg")
 const FORMSPREE_ID = 'mgoljbzw'
 
-/* ── HUD keyframe styles ── */
+
 const HUD_STYLES = `
   @keyframes hud-scan {
     0%   { top: -4px;   opacity: 0; }
@@ -87,7 +80,7 @@ const HUD_STYLES = `
   .hud-corner-br { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
 `
 
-/* ── SVG icons ── */
+
 function IconMail() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -119,7 +112,7 @@ const SOCIAL_LINKS = [
   { id: 'linkedin', label: 'LINKEDIN', val: 'linkedin.com/in/nayan-prajapati', href: 'https://www.linkedin.com/in/nayan-prajapati-a83888284/', Icon: IconLinkedin },
 ]
 
-/* ── HUD Field ── */
+
 function HudField({ label, id, name, type = 'text', placeholder, textarea, value, onChange }) {
   const [focused, setFocused] = useState(false)
   const Tag = textarea ? 'textarea' : 'input'
@@ -154,7 +147,7 @@ function HudField({ label, id, name, type = 'text', placeholder, textarea, value
   )
 }
 
-/* ── Social link row ── */
+
 function SocialRow({ link, index, isInView }) {
   const [hov, setHov] = useState(false)
   return (
@@ -207,7 +200,7 @@ function SocialRow({ link, index, isInView }) {
   )
 }
 
-/* ── Hex-grid SVG background ── */
+
 function HexGrid() {
   return (
     <svg
@@ -225,7 +218,7 @@ function HexGrid() {
   )
 }
 
-/* ── Main Component ── */
+
 export default function Contact() {
   const ref = useRef(null)
   const isInView = useInView(ref, { once: true, margin: '-60px' })
@@ -238,10 +231,10 @@ export default function Contact() {
     <Section id="contact" style={{ background: '#04060e', position: 'relative', overflow: 'hidden' }}>
       <style>{HUD_STYLES}</style>
 
-      {/* Hex-grid bg */}
+      
       <HexGrid />
 
-      {/* Arc-reactor rings */}
+      
       <div aria-hidden style={{ position: 'absolute', top: '50%', right: '-120px', transform: 'translateY(-50%)', pointerEvents: 'none' }}>
         {[220, 310, 400].map((size, i) => (
           <div key={i} className="hud-ring" style={{
@@ -263,7 +256,7 @@ export default function Contact() {
         transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
         style={{ position: 'relative', zIndex: 2, maxWidth: 720, margin: '0 auto' }}
       >
-        {/* ── Heading ── */}
+        
         <div style={{ marginBottom: '2.5rem' }}>
           <p style={{
             fontFamily: "'JetBrains Mono','Fira Code',monospace",
@@ -301,15 +294,15 @@ export default function Contact() {
           </div>
         </div>
 
-        {/* ── HUD Form panel ── */}
+        
         <div style={{ position: 'relative', marginBottom: '1.75rem' }}>
-          {/* Corner brackets */}
+          
           <span className="hud-corner hud-corner-tl" />
           <span className="hud-corner hud-corner-tr" />
           <span className="hud-corner hud-corner-bl" />
           <span className="hud-corner hud-corner-br" />
 
-          {/* Scanline */}
+          
           <div className="hud-scanline" />
 
           <form
@@ -324,22 +317,22 @@ export default function Contact() {
               gap: '1.6rem',
             }}
           >
-            {/* Name + Email row */}
+            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <HudField id="hud-name"  name="name"    label="CALLSIGN"     placeholder="Your name"       />
               <HudField id="hud-email" name="email"   label="FREQUENCY"    placeholder="your@email.com"  type="email" />
             </div>
 
-            {/* Message */}
+            
             <HudField id="hud-msg" name="message" label="TRANSMISSION" placeholder="What's the mission?" textarea />
 
-            {/* Formspree validation errors */}
+            
             <ValidationError prefix="Email" field="email" errors={formspreeState.errors}
               style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.72rem', color: '#ff6b6b', marginTop: '-0.5rem' }} />
             <ValidationError prefix="Message" field="message" errors={formspreeState.errors}
               style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: '0.72rem', color: '#ff6b6b', marginTop: '-0.5rem' }} />
 
-            {/* Submit */}
+            
             <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
               <button
                 type="submit"
@@ -371,7 +364,7 @@ export default function Contact() {
                 {submitting                && '⟳  TRANSMITTING...'}
                 {succeeded                 && '✓  MESSAGE SENT'}
 
-                {/* Progress sweep on sending */}
+                
                 {submitting && (
                   <motion.div
                     initial={{ scaleX: 0 }}
@@ -390,7 +383,7 @@ export default function Contact() {
           </form>
         </div>
 
-        {/* ── Social links ── */}
+        
         <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
           {SOCIAL_LINKS.map((l, i) => (
             <SocialRow key={l.id} link={l} index={i} isInView={isInView} />
