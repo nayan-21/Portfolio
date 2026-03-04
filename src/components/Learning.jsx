@@ -55,10 +55,10 @@ const PHASES = [
 const SKILLS = [
   { icon: '🧩', title: 'DSA (Java)',              category: 'PROBLEM SOLVING', fill: 60 },
   { icon: '⚛',  title: 'React Patterns',           category: 'FRONTEND',        fill: 78 },
-  { icon: '🗃',  title: 'SQL & Databases',          category: 'BACKEND',         fill: 65 },
+  { icon: '🗄️',  title: 'SQL & Databases',          category: 'BACKEND',         fill: 65 },
   { icon: '🧠', title: 'Core CS Fundamentals',     category: 'FUNDAMENTALS',    fill: 57 },
-  { icon: '🔗', title: 'REST APIs & Auth',          category: 'BACKEND',         fill: 70 },
-  { icon: '🖋',  title: 'Clean Code Practices',     category: 'CRAFT',           fill: 58 },
+  { icon: '🌐', title: 'REST APIs & Auth',          category: 'BACKEND',         fill: 70 },
+  { icon: '🎯',  title: 'Clean Code Practices',     category: 'CRAFT',           fill: 58 },
 ]
 
 /* ── Timeline dot ── */
